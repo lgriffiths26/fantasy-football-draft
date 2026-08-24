@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Draft 2026/27</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1a12;
+  --bg2: #152119;
+  --panel: #1a2d21;
+  --panel2: #213628;
+  --border: #2d5a3e;
+  --chalk: #eae8df;
+  --chalk-dim: #a3b0a3;
+  --gold: #d4a843;
+  --green: #6ec96e;
+  --red: #d65a5a;
+  --blue: #6ea8d6;
+  --font-display: 'Oswald', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--chalk);font-family:var(--font-body);min-height:100vh;}
+a{color:var(--gold);text-decoration:none;}
+
+header{background:linear-gradient(180deg,var(--bg2),var(--bg));border-bottom:3px solid var(--gold);padding:16px 24px 0;position:sticky;top:0;z-index:50;}
+.hdr-row{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+h1{font-family:var(--font-display);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:1.4rem;margin:0 0 12px;}
+h1 span{color:var(--gold);}
+.season-badge{font-family:var(--font-mono);font-size:.75rem;color:var(--chalk-dim);background:var(--panel);padding:3px 10px;border-radius:999px;border:1px solid var(--border);}
+.fpl-status{font-family:var(--font-mono);font-size:.7rem;color:var(--chalk-dim);padding:6px 0 10px;display:flex;align-items:center;gap:8px;}
+.fpl-status .dot{width:7px;height:7px;border-radius:50%;background:var(--chalk-dim);display:inline-block;}
+.fpl-status.ok .dot{background:var(--green);}
+.fpl-status.error .dot{background:var(--red);}
+.fpl-status button{background:none;border:1px solid var(--border);color:var(--chalk-dim);font-family:var(--font-mono);font-size:.68rem;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:auto;}
+.fpl-status button:hover{color:var(--chalk);border-color:var(--gold);}
+
+nav{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+nav button{background:0;border:0;border-bottom:3px solid transparent;color:var(--chalk-dim);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.05em;font-size:.85rem;padding:8px 14px 10px;cursor:pointer;white-space:nowrap;}
+nav button:hover{color:var(--chalk);}
+nav button.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px;}
+.view{display:none;}.view.active{display:block;}
+.section-title{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;font-size:1rem;color:var(--chalk-dim);margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+/* TABLE */
+.table-page-layout{display:grid;grid-template-columns:1fr;gap:20px;align-items:start;}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;}
+table.league{width:100%;border-collapse:collapse;font-size:.82rem;}
+table.league th{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:.7rem;color:var(--chalk-dim);text-align:left;padding:10px 8px;background:var(--bg2);position:sticky;top:0;white-space:nowrap;}
+table.league td{padding:8px;border-top:1px solid var(--border);font-family:var(--font-mono);white-space:nowrap;}
+table.league tbody tr{background:var(--panel);cursor:default;}
+table.league tbody tr:hover{background:var(--panel2);}
+table.league .team-name{font-family:var(--font-body);font-weight:600;color:var(--chalk);}
+table.league .pos-col{text-align:center;font-weight:700;width:32px;}
+table.league .pts-col{font-weight:700;color:var(--gold);}
+.relegation-row{border-top:2px solid var(--red) !important;}
+
+/* PRIZE POOL */
+.prize-sidebar{display:flex;flex-direction:column;gap:14px;}
+@media(min-width:900px){
+  .table-page-layout{grid-template-columns:1fr 300px;}
+}
+.prize-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+.prize-card h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;font-size:.85rem;color:var(--gold);margin-bottom:2px;}
+.prize-card .prize-subtitle{font-size:.72rem;color:var(--chalk-dim);margin-bottom:12px;}
+.prize-row{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:6px 2px;font-size:.85rem;border-bottom:1px solid rgba(45,90,62,.4);}
+.prize-row:last-child{border-bottom:none;}
+.prize-medal{font-size:1.1rem;text-align:center;}
+.prize-amount{font-family:var(--font-mono);font-weight:700;color:var(--gold);}
+.prize-team{font-weight:600;}
+.table-badge{display:inline-block;font-size:.75rem;margin-right:4px;}
+
+/* FIXTURES */
+.gw-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;}
+.gw-nav button{background:var(--panel);border:1px solid var(--border);color:var(--chalk);font-family:var(--font-display);text-transform:uppercase;font-size:.8rem;padding:8px 16px;border-radius:5px;cursor:pointer;}
+.gw-nav button:hover{background:var(--panel2);}
+.gw-label{font-family:var(--font-display);font-size:1.1rem;color:var(--gold);min-width:140px;text-align:center;}
+.match-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;padding:14px 16px;}
+.match-row{display:grid;grid-template-columns:1fr auto 36px auto 1fr;align-items:center;gap:8px;}
+.match-home{text-align:right;font-weight:600;font-size:.92rem;}
+.match-away{text-align:left;font-weight:600;font-size:.92rem;}
+.team-link{cursor:pointer;}
+.team-link:hover{color:var(--gold);text-decoration:underline;}
+.team-card.highlight{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);}
+.match-score{font-family:var(--font-mono);font-weight:700;font-size:1.1rem;text-align:center;color:var(--gold);}
+.match-dash{text-align:center;color:var(--chalk-dim);}
+.match-scorers{font-size:.75rem;color:var(--chalk-dim);margin-top:6px;display:grid;grid-template-columns:1fr 36px 1fr;gap:8px;}
+.match-scorers .home-scorers{text-align:right;}
+.match-scorers .away-scorers{text-align:left;}
+.match-future .match-score{color:var(--chalk-dim);font-size:.85rem;}
+
+/* TEAMS */
+.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+.team-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+.team-card-name{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:1rem;margin-bottom:2px;}
+.team-card-meta{font-family:var(--font-mono);font-size:.72rem;color:var(--chalk-dim);margin-bottom:12px;}
+.team-player{display:grid;grid-template-columns:56px 1fr auto;gap:8px;align-items:center;padding:5px 8px;border-radius:4px;font-size:.82rem;cursor:pointer;}
+.team-player:hover{background:var(--panel2);}
+
+.player-link{cursor:pointer;}
+.player-link:hover{color:var(--gold);text-decoration:underline;}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,20,14,.75);z-index:100;align-items:flex-start;justify-content:center;padding:8vh 16px;overflow-y:auto;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--panel);border:1px solid var(--border);border-top:4px solid var(--gold);border-radius:8px;width:100%;max-width:420px;padding:22px 24px;}
+.modal h2{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:1.1rem;margin:0 0 2px;}
+.modal .modal-sub{color:var(--gold);font-family:var(--font-mono);font-size:.85rem;margin-bottom:16px;}
+.goal-row{display:grid;grid-template-columns:50px 1fr auto;gap:10px;align-items:center;padding:7px 4px;font-size:.85rem;border-bottom:1px solid rgba(45,90,62,.4);}
+.goal-row .gw-tag{font-family:var(--font-mono);color:var(--chalk-dim);font-size:.75rem;}
+.goal-row .goal-count{font-family:var(--font-mono);color:var(--gold);font-weight:700;}
+.modal-close-btn{margin-top:18px;width:100%;background:transparent;border:1px solid var(--border);color:var(--chalk);font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;font-size:.85rem;padding:10px;border-radius:5px;cursor:pointer;}
+.modal-close-btn:hover{background:var(--panel2);}
+.pos-tag{font-family:var(--font-mono);font-size:.65rem;font-weight:700;text-align:center;padding:3px 0;border-radius:3px;color:var(--bg);}
+.pos-tag.def{background:#7fb0e0;}.pos-tag.mid{background:#8fd18c;}.pos-tag.str{background:#e08a6b;}
+.player-cost{font-family:var(--font-mono);color:var(--gold);}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.stats-section{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.stats-section h3{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em;font-size:.85rem;color:var(--gold);margin-bottom:12px;}
+.stat-row{display:grid;grid-template-columns:22px minmax(0,1fr) 44px;gap:6px;align-items:center;padding:6px 4px;font-size:.82rem;border-bottom:1px solid rgba(45,90,62,.4);}
+.stat-name-block{min-width:0;}
+.stat-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.stat-rank{font-family:var(--font-mono);font-size:.7rem;color:var(--chalk-dim);text-align:center;}
+.stat-team{font-size:.72rem;color:var(--chalk-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.stat-goals{font-family:var(--font-mono);font-weight:700;color:var(--gold);}
+
+.mip-section{grid-column:1/-1;}
+.mip-table{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:fixed;}
+.mip-table th{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:.65rem;color:var(--chalk-dim);text-align:center;padding:6px 4px;border-bottom:2px solid var(--border);}
+.mip-table th:nth-child(1),.mip-table td:nth-child(1){width:24px;}
+.mip-table th:nth-child(2),.mip-table td:nth-child(2){width:auto;text-align:left;}
+.mip-table th:nth-child(3),.mip-table td:nth-child(3){width:62px;}
+.mip-table th:nth-child(4),.mip-table td:nth-child(4){width:62px;}
+.mip-table td{padding:6px 4px;border-bottom:1px solid rgba(45,90,62,.4);vertical-align:middle;}
+.mip-table td:nth-child(2) > div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mip-table td:nth-child(3),.mip-table td:nth-child(4){text-align:center;}
+
+/* STREAKS */
+.streaks-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;}
+.streaks-wrap table.league{border-collapse:collapse;}
+.streaks-wrap table.league th,.streaks-wrap table.league td{white-space:nowrap;padding:9px 16px;text-align:center;}
+.streaks-wrap table.league:not(#luck-table) th:first-child,.streaks-wrap table.league:not(#luck-table) td:first-child{
+  text-align:left;position:sticky;left:0;background:var(--panel);z-index:1;
+}
+.streaks-wrap table.league:not(#luck-table) thead th:first-child{background:var(--bg2);z-index:2;}
+.streaks-legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.75rem;color:var(--chalk-dim);margin-bottom:10px;}
+.legend-item{display:flex;align-items:center;gap:6px;}
+.legend-swatch{display:inline-block;width:14px;height:14px;border-radius:3px;}
+.legend-swatch.streak-leader{background:rgba(224,185,78,.35);}
+.legend-swatch.streak-record-broken{background:rgba(110,168,214,.35);}
+.streak-leader{background:rgba(224,185,78,.18);color:var(--gold);font-weight:700;}
+.streak-record-broken{background:rgba(110,168,214,.2);color:var(--blue);font-weight:700;}
+#record-holders-table td:nth-child(2){font-family:var(--font-mono);color:var(--gold);font-weight:700;text-align:center;}
+#record-holders-table td:nth-child(3){color:var(--chalk-dim);font-size:.8rem;white-space:normal;}
+
+#luck-table{border-collapse:separate;border-spacing:0;table-layout:fixed;width:680px;}
+#luck-table thead th.sticky-team-col,#luck-table td:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#luck-table th,#luck-table td{white-space:nowrap;padding:8px 14px;}
+#luck-table td:first-child{text-align:left;position:sticky;left:0;background:var(--panel);z-index:1;}
+#luck-table th:not(.sticky-team-col):not([colspan]),#luck-table td:not(:first-child){text-align:center;font-size:.75rem;}
+#luck-table thead tr:first-child th{cursor:default;background:var(--bg2);text-align:center;}
+#luck-table thead th.sticky-team-col{position:sticky;left:0;background:var(--bg2);z-index:2;}
+#luck-table th[data-sort]{cursor:pointer;user-select:none;}
+#luck-table th[data-sort]:hover{color:var(--chalk);}
+#luck-table th.sorted{color:var(--gold);}
+#luck-table .sort-arrow{font-size:.6rem;margin-left:2px;}
+.luck-explainer{font-size:.8rem;color:var(--chalk-dim);margin-bottom:16px;line-height:1.5;}
+.luck-negative{color:var(--red);}
+
+@media(max-width:600px){
+  .match-row{grid-template-columns:1fr auto 28px auto 1fr;font-size:.8rem;}
+  .match-home,.match-away{font-size:.78rem;}
+  nav button{font-size:.75rem;padding:6px 10px 8px;}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr-row">
+    <h1>The Draft <span>2026/27</span></h1>
+    <span class="season-badge">GW <span id="current-gw">-</span> / 38</span>
+  </div>
+  <nav id="main-nav">
+    <button class="active" data-view="table">Table</button>
+    <button data-view="fixtures">Fixtures</button>
+    <button data-view="teams">Teams</button>
+    <button data-view="stats">Statistics</button>
+    <button data-view="streaks">Streaks</button>
+    <button data-view="luck">Luck</button>
+  </nav>
+  <div id="fpl-status" class="fpl-status">
+    <span class="dot"></span><span id="fpl-status-text">Checking for new results...</span>
+    <button onclick="manualRefresh()">Refresh now</button>
+  </div>
+</header>
+
+<main>
+  <!-- TABLE -->
+  <section id="view-table" class="view active">
+    <div class="table-page-layout">
+      <div class="table-wrap">
+        <table class="league" id="league-table">
+          <thead><tr>
+            <th class="pos-col">#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
+            <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+          </tr></thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <div class="prize-sidebar" id="prize-grid"></div>
+    </div>
+  </section>
+
+  <!-- FIXTURES -->
+  <section id="view-fixtures" class="view">
+    <div class="gw-nav">
+      <button onclick="changeGW(-1)">◀ Prev</button>
+      <span class="gw-label" id="gw-label">Gameweek 1</span>
+      <button onclick="changeGW(1)">Next ▶</button>
+    </div>
+    <div id="fixtures-list"></div>
+  </section>
+
+  <!-- TEAMS -->
+  <section id="view-teams" class="view">
+    <div class="teams-grid" id="teams-grid"></div>
+  </section>
+
+  <!-- STATISTICS -->
+  <section id="view-stats" class="view">
+    <div class="stats-grid" id="stats-grid"></div>
+  </section>
+
+  <!-- STREAKS -->
+  <section id="view-streaks" class="view">
+    <div class="section-title">Current Streaks</div>
+    <div class="streaks-legend">
+      <span class="legend-item"><span class="legend-swatch streak-leader"></span> Current league leader in that category</span>
+      <span class="legend-item"><span class="legend-swatch streak-record-broken"></span> 🏆 All-time record broken</span>
+    </div>
+    <div class="streaks-wrap">
+      <table class="league" id="streaks-table">
+        <thead><tr>
+          <th>Team</th><th>Win</th><th>Draw</th><th>Lose</th><th>Unbeaten</th><th>Without Win</th>
+          <th>Scored</th><th>Blanked</th><th>Clean Sheet</th><th>Conceded</th><th>BTTS</th>
+        </tr></thead>
+        <tbody id="streaks-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-top:28px;">Max Streaks This Season</div>
+    <div class="streaks-wrap">
+      <table class="league" id="max-streaks-table">
+        <thead><tr>
+          <th>Team</th><th>Win</th><th>Draw</th><th>Lose</th><th>Unbeaten</th><th>Without Win</th>
+          <th>Scored</th><th>Blanked</th><th>Clean Sheet</th><th>Conceded</th><th>BTTS</th>
+        </tr></thead>
+        <tbody id="max-streaks-body"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-top:28px;">All-Time Record Holders</div>
+    <div class="streaks-wrap">
+      <table class="league" id="record-holders-table">
+        <thead><tr><th>Category</th><th>Record</th><th>Held By</th></tr></thead>
+        <tbody id="record-holders-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LUCK -->
+  <section id="view-luck" class="view">
+    <div class="section-title">Luck</div>
+    <div class="luck-explainer">For each team, compares actual points earned against the average points they'd have earned had their goal tally in each fixture been measured against their opponent's output across every gameweek played so far in that half of the season (GW1-19, then GW20-38 restarts the comparison). Positive points luck = scored more than your results show; negative position luck = sitting lower than your underlying output deserves.</div>
+    <div class="streaks-wrap">
+      <table class="league" id="luck-table">
+        <colgroup>
+          <col style="width:140px">
+          <col style="width:70px"><col style="width:70px"><col style="width:70px"><col style="width:60px">
+          <col style="width:70px"><col style="width:70px"><col style="width:70px"><col style="width:60px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th rowspan="2" class="sticky-team-col">Team</th>
+            <th colspan="4">Points</th>
+            <th colspan="4">Position</th>
+          </tr>
+          <tr>
+            <th data-sort="pointsCalculated">Calc <span class="sort-arrow"></span></th>
+            <th data-sort="pointsActual">Actual <span class="sort-arrow"></span></th>
+            <th data-sort="pointsLuck">Luck <span class="sort-arrow"></span></th>
+            <th data-sort="pointsLuckRank">Rank <span class="sort-arrow"></span></th>
+            <th data-sort="positionCalculated">Calc <span class="sort-arrow"></span></th>
+            <th data-sort="positionActual">Actual <span class="sort-arrow"></span></th>
+            <th data-sort="positionLuck">Luck <span class="sort-arrow"></span></th>
+            <th data-sort="positionLuckRank">Rank <span class="sort-arrow"></span></th>
+          </tr>
+        </thead>
+        <tbody id="luck-body"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- PLAYER GOALS MODAL -->
+<div class="modal-overlay" id="player-modal-overlay">
+  <div class="modal">
+    <h2 id="player-modal-name">Player Name</h2>
+    <div class="modal-sub" id="player-modal-total">0 goals</div>
+    <div id="player-modal-breakdown"></div>
+    <button class="modal-close-btn" onclick="closePlayerModal()">Close</button>
+  </div>
+</div>
+
+<script>
+const DATA = {"season": "2026/27", "current_gameweek": 0, "teams": [{"name": "Larry Griffiths", "budget_left": 2, "players": [{"name": "Trai Hume", "cost": 5, "position": "Defender"}, {"name": "Reece James", "cost": 4, "position": "Defender"}, {"name": "Ryan Sessegnon", "cost": 4, "position": "Defender"}, {"name": "James Maddison", "cost": 22, "position": "Midfielder"}, {"name": "Daizen Maeda", "cost": 19, "position": "Midfielder"}, {"name": "Brenden Aaronson", "cost": 17, "position": "Midfielder"}, {"name": "Cesar Palacios", "cost": 6, "position": "Midfielder"}, {"name": "Gustavo Hamer", "cost": 4, "position": "Midfielder"}, {"name": "Alexander Isak", "cost": 142, "position": "Striker"}, {"name": "Evanilson", "cost": 75, "position": "Striker"}]}, {"name": "Ben Settle", "budget_left": 29, "players": [{"name": "Micky van de Ven", "cost": 5, "position": "Defender"}, {"name": "Rayan Ait-Nouri", "cost": 2, "position": "Defender"}, {"name": "Mats Wieffer", "cost": 2, "position": "Defender"}, {"name": "Rayan Cherki", "cost": 55, "position": "Midfielder"}, {"name": "Oscar Bobb", "cost": 17, "position": "Midfielder"}, {"name": "Alexis Mac Allister", "cost": 12, "position": "Midfielder"}, {"name": "Jaidon Anthony", "cost": 10, "position": "Midfielder"}, {"name": "Ryan Gravenberch", "cost": 10, "position": "Midfielder"}, {"name": "Igor Thiago", "cost": 122, "position": "Striker"}, {"name": "Nick Woltemade", "cost": 36, "position": "Striker"}]}, {"name": "Matt Smith", "budget_left": 19, "players": [{"name": "Jayden Bogle", "cost": 5, "position": "Defender"}, {"name": "Malick Thiaw", "cost": 4, "position": "Defender"}, {"name": "Jurrien Timber", "cost": 3, "position": "Defender"}, {"name": "Dominik Szoboszlai", "cost": 50, "position": "Midfielder"}, {"name": "Estevao", "cost": 50, "position": "Midfielder"}, {"name": "Rio Ngumoha", "cost": 36, "position": "Midfielder"}, {"name": "Diego Gomez", "cost": 25, "position": "Midfielder"}, {"name": "Emile Smith Rowe", "cost": 18, "position": "Midfielder"}, {"name": "Kai Havertz", "cost": 80, "position": "Striker"}, {"name": "Alvaro Rodriguez", "cost": 10, "position": "Striker"}]}, {"name": "Ludo Goodliffe", "budget_left": 12, "players": [{"name": "Daniel Munoz", "cost": 7, "position": "Defender"}, {"name": "Ferdi Kadioglu", "cost": 5, "position": "Defender"}, {"name": "Ruben Dias", "cost": 3, "position": "Defender"}, {"name": "Enzo Fernandez", "cost": 42, "position": "Midfielder"}, {"name": "Pascal Gross", "cost": 17, "position": "Midfielder"}, {"name": "Andrey Santos", "cost": 8, "position": "Midfielder"}, {"name": "Tyrique George", "cost": 2, "position": "Midfielder"}, {"name": "Mathias Jensen", "cost": 1, "position": "Midfielder"}, {"name": "Erling Haaland", "cost": 194, "position": "Striker"}, {"name": "Hugo Ekitike", "cost": 9, "position": "Striker"}]}, {"name": "Adam Davey", "budget_left": 0, "players": [{"name": "Maxence Lacroix", "cost": 6, "position": "Defender"}, {"name": "Harry Maguire", "cost": 4, "position": "Defender"}, {"name": "Issa Diop", "cost": 2, "position": "Defender"}, {"name": "Bukayo Saka", "cost": 99, "position": "Midfielder"}, {"name": "Bruno Fernandes", "cost": 90, "position": "Midfielder"}, {"name": "Christos Tzolis", "cost": 55, "position": "Midfielder"}, {"name": "Dan Ndoye", "cost": 17, "position": "Midfielder"}, {"name": "Yasin Ayari", "cost": 10, "position": "Midfielder"}, {"name": "Callum Wilson", "cost": 1, "position": "Striker"}, {"name": "Rodrigo Muniz", "cost": 1, "position": "Striker"}]}, {"name": "Josh Clarke & Josh Pickover", "budget_left": 5, "players": [{"name": "Piero Hincapie", "cost": 1, "position": "Defender"}, {"name": "Jarrad Branthwaite", "cost": 1, "position": "Defender"}, {"name": "Kristoffer Ajer", "cost": 1, "position": "Defender"}, {"name": "Matheus Cunha", "cost": 81, "position": "Midfielder"}, {"name": "Ismaila Sarr", "cost": 71, "position": "Midfielder"}, {"name": "Kiernan Dewsbury-Hall", "cost": 32, "position": "Midfielder"}, {"name": "Declan Rice", "cost": 26, "position": "Midfielder"}, {"name": "Mathys Tel", "cost": 13, "position": "Midfielder"}, {"name": "Nicolas Jackson", "cost": 45, "position": "Striker"}, {"name": "Beto", "cost": 24, "position": "Striker"}]}, {"name": "Jonathan Crabb", "budget_left": 0, "players": [{"name": "Nico O'Reilly", "cost": 20, "position": "Defender"}, {"name": "Gabriel Magalhaes", "cost": 13, "position": "Defender"}, {"name": "Neco Williams", "cost": 6, "position": "Defender"}, {"name": "Cody Gakpo", "cost": 82, "position": "Midfielder"}, {"name": "Savinho", "cost": 36, "position": "Midfielder"}, {"name": "Brennan Johnson", "cost": 23, "position": "Midfielder"}, {"name": "Elliot Anderson", "cost": 17, "position": "Midfielder"}, {"name": "Nilson Angulo", "cost": 1, "position": "Midfielder"}, {"name": "Gonzalo Garcia", "cost": 70, "position": "Striker"}, {"name": "Taiwo Awoniyi", "cost": 32, "position": "Striker"}]}, {"name": "Chris Ashton", "budget_left": 9, "players": [{"name": "Marcos Senesi", "cost": 2, "position": "Defender"}, {"name": "Adrien Truffert", "cost": 2, "position": "Defender"}, {"name": "Amar Dedic", "cost": 2, "position": "Defender"}, {"name": "Morgan Gibbs-White", "cost": 76, "position": "Midfielder"}, {"name": "Iliman Ndiaye", "cost": 52, "position": "Midfielder"}, {"name": "Kaoru Mitoma", "cost": 32, "position": "Midfielder"}, {"name": "Julio Enciso", "cost": 20, "position": "Midfielder"}, {"name": "Joelinton", "cost": 2, "position": "Midfielder"}, {"name": "Dominic Calvert-Lewin", "cost": 101, "position": "Striker"}, {"name": "Tammy Abraham", "cost": 2, "position": "Striker"}]}, {"name": "Ali Parkin & Cal Trewavas", "budget_left": 56, "players": [{"name": "Josko Gvardiol", "cost": 7, "position": "Defender"}, {"name": "Pedro Porro", "cost": 7, "position": "Defender"}, {"name": "Daniel Ballard", "cost": 5, "position": "Defender"}, {"name": "Eberechi Eze", "cost": 41, "position": "Midfielder"}, {"name": "Mohammed Kudus", "cost": 39, "position": "Midfielder"}, {"name": "Anton Stach", "cost": 18, "position": "Midfielder"}, {"name": "Dwight McNeil", "cost": 12, "position": "Midfielder"}, {"name": "Kevin", "cost": 9, "position": "Midfielder"}, {"name": "Brian Brobbey", "cost": 77, "position": "Striker"}, {"name": "Liam Delap", "cost": 29, "position": "Striker"}]}, {"name": "Joe Reeve", "budget_left": 29, "players": [{"name": "Tarik Muharemovic", "cost": 6, "position": "Defender"}, {"name": "Jan Paul van Hecke", "cost": 5, "position": "Defender"}, {"name": "Michael Kayode", "cost": 1, "position": "Defender"}, {"name": "Harry Wilson", "cost": 53, "position": "Midfielder"}, {"name": "Johan Manzambi", "cost": 35, "position": "Midfielder"}, {"name": "Alex Iwobi", "cost": 20, "position": "Midfielder"}, {"name": "Sandro Tonali", "cost": 14, "position": "Midfielder"}, {"name": "Habib Diarra", "cost": 14, "position": "Midfielder"}, {"name": "Viktor Gyokeres", "cost": 120, "position": "Striker"}, {"name": "Chris Wood", "cost": 3, "position": "Striker"}]}, {"name": "Tom Donnelly", "budget_left": 28, "players": [{"name": "Virgil van Dijk", "cost": 10, "position": "Defender"}, {"name": "Maxim De Cuyper", "cost": 10, "position": "Defender"}, {"name": "Riccardo Calafiori", "cost": 8, "position": "Defender"}, {"name": "Dango Ouattara", "cost": 45, "position": "Midfielder"}, {"name": "Enzo Le Fee", "cost": 44, "position": "Midfielder"}, {"name": "Mikel Merino", "cost": 20, "position": "Midfielder"}, {"name": "Youri Tielemans", "cost": 20, "position": "Midfielder"}, {"name": "Conor Gallagher", "cost": 5, "position": "Midfielder"}, {"name": "Thierno Barry", "cost": 60, "position": "Striker"}, {"name": "Will Osula", "cost": 50, "position": "Striker"}]}, {"name": "Chris Smith & Tom Verghese", "budget_left": 39, "players": [{"name": "Marco Palestra", "cost": 8, "position": "Defender"}, {"name": "Jeremy Jacquet", "cost": 2, "position": "Defender"}, {"name": "Ronald Araujo", "cost": 1, "position": "Defender"}, {"name": "Rayan", "cost": 57, "position": "Midfielder"}, {"name": "Martin Odegaard", "cost": 50, "position": "Midfielder"}, {"name": "Jeremy Doku", "cost": 41, "position": "Midfielder"}, {"name": "Yankuba Minteh", "cost": 26, "position": "Midfielder"}, {"name": "Victor Munoz", "cost": 15, "position": "Midfielder"}, {"name": "Promise David", "cost": 41, "position": "Striker"}, {"name": "Brian Madjo", "cost": 20, "position": "Striker"}]}, {"name": "Oli Major", "budget_left": 8, "players": [{"name": "Nikola Milenkovic", "cost": 1, "position": "Defender"}, {"name": "Pascal Struijk", "cost": 1, "position": "Defender"}, {"name": "Timothy Castagne", "cost": 1, "position": "Defender"}, {"name": "Noah Okafor", "cost": 51, "position": "Midfielder"}, {"name": "Alejandro Garnacho", "cost": 32, "position": "Midfielder"}, {"name": "Anthony Elanga", "cost": 24, "position": "Midfielder"}, {"name": "Hayden Hackney", "cost": 8, "position": "Midfielder"}, {"name": "Patrick Dorgu", "cost": 6, "position": "Midfielder"}, {"name": "Benjamin Sesko", "cost": 96, "position": "Striker"}, {"name": "Jean-Philippe Mateta", "cost": 72, "position": "Striker"}]}, {"name": "Mike Coombes & Mike Carre", "budget_left": 35, "players": [{"name": "James Tarkowski", "cost": 4, "position": "Defender"}, {"name": "Milos Kerkez", "cost": 4, "position": "Defender"}, {"name": "Ian Maatsen", "cost": 2, "position": "Defender"}, {"name": "Morgan Rogers", "cost": 77, "position": "Midfielder"}, {"name": "Kevin Schade", "cost": 71, "position": "Midfielder"}, {"name": "Mateus Fernandes", "cost": 20, "position": "Midfielder"}, {"name": "Josh King", "cost": 15, "position": "Midfielder"}, {"name": "Jaden Philogene", "cost": 6, "position": "Midfielder"}, {"name": "Georginio Rutter", "cost": 30, "position": "Striker"}, {"name": "Haji Wright", "cost": 1, "position": "Striker"}]}, {"name": "Jonathan Gardiner & Ryan Gregory", "budget_left": 19, "players": [{"name": "Murillo", "cost": 1, "position": "Defender"}, {"name": "Chris Richards", "cost": 1, "position": "Defender"}, {"name": "Omar Alderete", "cost": 1, "position": "Defender"}, {"name": "Marcus Rashford", "cost": 56, "position": "Midfielder"}, {"name": "Emiliano Buendia", "cost": 55, "position": "Midfielder"}, {"name": "Marcus Tavernier", "cost": 31, "position": "Midfielder"}, {"name": "Amad Diallo", "cost": 13, "position": "Midfielder"}, {"name": "Noni Madueke", "cost": 8, "position": "Midfielder"}, {"name": "Yoane Wissa", "cost": 67, "position": "Striker"}, {"name": "Dominic Solanke", "cost": 48, "position": "Striker"}]}, {"name": "Nick Smith & Ollie Verghese", "budget_left": 29, "players": [{"name": "Marc Guehi", "cost": 2, "position": "Defender"}, {"name": "Sven Botman", "cost": 2, "position": "Defender"}, {"name": "Ezri Konsa", "cost": 2, "position": "Defender"}, {"name": "Bryan Mbeumo", "cost": 111, "position": "Midfielder"}, {"name": "Florian Wirtz", "cost": 86, "position": "Midfielder"}, {"name": "Mikkel Damsgaard", "cost": 1, "position": "Midfielder"}, {"name": "Ethan Ampadu", "cost": 1, "position": "Midfielder"}, {"name": "Mason Mount", "cost": 1, "position": "Midfielder"}, {"name": "Omar Marmoush", "cost": 62, "position": "Striker"}, {"name": "Charalampos Kostoulas", "cost": 3, "position": "Striker"}]}, {"name": "Louis Baker", "budget_left": 67, "players": [{"name": "Jeremie Frimpong", "cost": 4, "position": "Defender"}, {"name": "Diogo Dalot", "cost": 3, "position": "Defender"}, {"name": "Matheus Nunes", "cost": 2, "position": "Defender"}, {"name": "Cole Palmer", "cost": 119, "position": "Midfielder"}, {"name": "Jack Hinshelwood", "cost": 40, "position": "Midfielder"}, {"name": "Bruno Guimaraes", "cost": 13, "position": "Midfielder"}, {"name": "Junior Kroupi", "cost": 11, "position": "Midfielder"}, {"name": "Mamadou Sangare", "cost": 1, "position": "Midfielder"}, {"name": "Oliver McBurnie", "cost": 30, "position": "Striker"}, {"name": "Emersonn", "cost": 10, "position": "Striker"}]}, {"name": "Joe Pickover", "budget_left": 11, "players": [{"name": "Luka Vuskovic", "cost": 9, "position": "Defender"}, {"name": "Ousmane Diomande", "cost": 3, "position": "Defender"}, {"name": "Matty Cash", "cost": 3, "position": "Defender"}, {"name": "Justin Kluivert", "cost": 60, "position": "Midfielder"}, {"name": "Harvey Barnes", "cost": 54, "position": "Midfielder"}, {"name": "John McGinn", "cost": 34, "position": "Midfielder"}, {"name": "Jack Grealish", "cost": 1, "position": "Midfielder"}, {"name": "Bazoumana Toure", "cost": 1, "position": "Midfielder"}, {"name": "Igor Jesus", "cost": 73, "position": "Striker"}, {"name": "Jorgen Strand Larsen", "cost": 51, "position": "Striker"}]}, {"name": "Steven Hadfield", "budget_left": 24, "players": [{"name": "Nordi Mukiele", "cost": 2, "position": "Defender"}, {"name": "Malo Gusto", "cost": 1, "position": "Defender"}, {"name": "Dara O'Shea", "cost": 1, "position": "Defender"}, {"name": "Antoine Semenyo", "cost": 96, "position": "Midfielder"}, {"name": "Phil Foden", "cost": 70, "position": "Midfielder"}, {"name": "Jack Clarke", "cost": 30, "position": "Midfielder"}, {"name": "Alex Scott", "cost": 5, "position": "Midfielder"}, {"name": "Callum Hudson-Odoi", "cost": 2, "position": "Midfielder"}, {"name": "Richarlison", "cost": 61, "position": "Striker"}, {"name": "Ellis Simms", "cost": 8, "position": "Striker"}]}, {"name": "Steve Miles", "budget_left": 54, "players": [{"name": "Nathan Collins", "cost": 3, "position": "Defender"}, {"name": "Michael Keane", "cost": 3, "position": "Defender"}, {"name": "Lewis Hall", "cost": 2, "position": "Defender"}, {"name": "Pedro Neto", "cost": 15, "position": "Midfielder"}, {"name": "Moises Caicedo", "cost": 7, "position": "Midfielder"}, {"name": "James Garner", "cost": 5, "position": "Midfielder"}, {"name": "Yeremy Pino", "cost": 5, "position": "Midfielder"}, {"name": "Keane Lewis-Potter", "cost": 1, "position": "Midfielder"}, {"name": "Joao Pedro", "cost": 173, "position": "Striker"}, {"name": "Ollie Watkins", "cost": 7, "position": "Striker"}]}], "table": [{"position": 1, "team": "Adam Davey", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 2, "team": "Ali Parkin & Cal Trewavas", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 3, "team": "Ben Settle", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 4, "team": "Chris Ashton", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 5, "team": "Chris Smith & Tom Verghese", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 6, "team": "Joe Pickover", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 7, "team": "Joe Reeve", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 8, "team": "Jonathan Crabb", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 9, "team": "Jonathan Gardiner & Ryan Gregory", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 10, "team": "Josh Clarke & Josh Pickover", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 11, "team": "Larry Griffiths", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 12, "team": "Louis Baker", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 13, "team": "Ludo Goodliffe", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 14, "team": "Matt Smith", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 15, "team": "Mike Coombes & Mike Carre", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 16, "team": "Nick Smith & Ollie Verghese", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 17, "team": "Oli Major", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 18, "team": "Steve Miles", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 19, "team": "Steven Hadfield", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}, {"position": 20, "team": "Tom Donnelly", "played": 0, "won": 0, "drawn": 0, "lost": 0, "goals_for": 0, "goals_against": 0, "goal_diff": 0, "points": 0, "clean_sheets": 0, "goalless_weeks": 0}], "statistics": {"defenders": [], "midfielders": [], "strikers": [], "goalsFromDefence": [], "goalsFromMidfield": [], "goalsFromStrikeforce": [], "mostImportantPlayers": []}, "streaks": {"current": []}, "luck": [], "fixtures": {"1": [{"home": "Larry Griffiths", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "2": [{"home": "Steve Miles", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "3": [{"home": "Larry Griffiths", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "4": [{"home": "Steve Miles", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "5": [{"home": "Larry Griffiths", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "6": [{"home": "Steve Miles", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "7": [{"home": "Tom Donnelly", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "8": [{"home": "Larry Griffiths", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steve Miles", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "9": [{"home": "Steve Miles", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "10": [{"home": "Larry Griffiths", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "11": [{"home": "Steve Miles", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "12": [{"home": "Larry Griffiths", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "13": [{"home": "Steve Miles", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "14": [{"home": "Larry Griffiths", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "15": [{"home": "Larry Griffiths", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "16": [{"home": "Steve Miles", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "17": [{"home": "Larry Griffiths", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "18": [{"home": "Steve Miles", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "19": [{"home": "Steve Miles", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "20": [{"home": "Larry Griffiths", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "21": [{"home": "Steve Miles", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "22": [{"home": "Larry Griffiths", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "23": [{"home": "Steve Miles", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "24": [{"home": "Larry Griffiths", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "25": [{"home": "Steve Miles", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "26": [{"home": "Larry Griffiths", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "27": [{"home": "Larry Griffiths", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "28": [{"home": "Steve Miles", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "29": [{"home": "Larry Griffiths", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "30": [{"home": "Steve Miles", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "31": [{"home": "Steve Miles", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "32": [{"home": "Larry Griffiths", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "33": [{"home": "Steve Miles", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "34": [{"home": "Larry Griffiths", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "35": [{"home": "Steve Miles", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Tom Donnelly", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "36": [{"home": "Larry Griffiths", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "37": [{"home": "Larry Griffiths", "away": "Ali Parkin & Cal Trewavas", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Oli Major", "away": "Jonathan Crabb", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steve Miles", "away": "Steven Hadfield", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Nick Smith & Ollie Verghese", "away": "Tom Donnelly", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ben Settle", "away": "Josh Clarke & Josh Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Louis Baker", "away": "Mike Coombes & Mike Carre", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Matt Smith", "away": "Ludo Goodliffe", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Ashton", "away": "Chris Smith & Tom Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Gardiner & Ryan Gregory", "away": "Adam Davey", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Reeve", "away": "Joe Pickover", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}], "38": [{"home": "Tom Donnelly", "away": "Ben Settle", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Josh Clarke & Josh Pickover", "away": "Larry Griffiths", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Mike Coombes & Mike Carre", "away": "Matt Smith", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Chris Smith & Tom Verghese", "away": "Oli Major", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Steven Hadfield", "away": "Jonathan Gardiner & Ryan Gregory", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Jonathan Crabb", "away": "Chris Ashton", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ludo Goodliffe", "away": "Nick Smith & Ollie Verghese", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Joe Pickover", "away": "Steve Miles", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Adam Davey", "away": "Joe Reeve", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}, {"home": "Ali Parkin & Cal Trewavas", "away": "Louis Baker", "home_score": null, "away_score": null, "home_scorers": [], "away_scorers": []}]}, "maxStreaks": []};
+
+const PRIZE_POOL = {
+  main: { amounts: [1775, 975, 500], excludes: null, title: 'Main Prize Pool', subtitle: 'Final league position — all 20 teams eligible' },
+  side: { amounts: [1305, 715, 355], excludes: 'Steve Miles', title: 'Side Prize Pool', subtitle: 'Same placings, Steve Miles not eligible' },
+};
+const MEDALS = ['🥇', '🥈', '🥉'];
+
+function getPoolStandings(pool) {
+  const eligible = pool.excludes ? DATA.table.filter(t => t.team !== pool.excludes) : DATA.table;
+  return eligible.slice(0, pool.amounts.length);
+}
+
+function renderPrizePool() {
+  const grid = document.getElementById('prize-grid');
+  grid.innerHTML = Object.values(PRIZE_POOL).map(pool => {
+    const standings = getPoolStandings(pool);
+    const rows = pool.amounts.map((amount, i) => {
+      const entry = standings[i];
+      return `<div class="prize-row">
+        <div class="prize-medal">${MEDALS[i] || (i + 1) + '.'}</div>
+        <div class="prize-team">${entry ? esc(entry.team) : '-'}</div>
+        <div class="prize-amount">£${amount}</div>
+      </div>`;
+    }).join('');
+    return `<div class="prize-card">
+      <h3>${esc(pool.title)}</h3>
+      <div class="prize-subtitle">${esc(pool.subtitle)}</div>
+      ${rows}
+    </div>`;
+  }).join('');
+}
+
+// For a given team, returns badge HTML for any prize positions it currently holds.
+function prizeBadgesFor(teamName) {
+  let badges = '';
+  Object.values(PRIZE_POOL).forEach(pool => {
+    const standings = getPoolStandings(pool);
+    const idx = standings.findIndex(t => t.team === teamName);
+    if (idx !== -1) badges += `<span class="table-badge" title="${esc(pool.title)}">${MEDALS[idx] || ''}</span>`;
+  });
+  return badges;
+}
+
+let viewingGW = DATA.current_gameweek || 1;
+
+document.getElementById('current-gw').textContent = DATA.current_gameweek;
+
+/* NAV */
+document.getElementById('main-nav').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + btn.dataset.view).classList.add('active');
+});
+
+/* TABLE */
+function renderTable() {
+  renderPrizePool();
+  const tbody = document.getElementById('table-body');
+  const total = DATA.table.length;
+  tbody.innerHTML = DATA.table.map((r, i) => {
+    const relClass = (i === total - 3) ? ' class="relegation-row"' : '';
+    return `<tr${relClass}>
+      <td class="pos-col">${r.position}</td>
+      <td class="team-name">${prizeBadgesFor(r.team)}${esc(r.team)}</td>
+      <td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td>
+      <td>${r.goals_for}</td><td>${r.goals_against}</td>
+      <td>${r.goal_diff > 0 ? '+' + r.goal_diff : r.goal_diff}</td>
+      <td class="pts-col">${r.points}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* FIXTURES */
+function renderFixtures() {
+  const isLivePreview = liveGameweekPreview && liveGameweekPreview.gw === viewingGW;
+  const matches = isLivePreview ? liveGameweekPreview.fixtures : (DATA.fixtures[String(viewingGW)] || []);
+  document.getElementById('gw-label').textContent = 'Gameweek ' + viewingGW + (isLivePreview ? ' (LIVE)' : '');
+  const isPlayed = viewingGW <= DATA.current_gameweek || isLivePreview;
+  document.getElementById('fixtures-list').innerHTML = matches.map(m => {
+    const hasGoals = (m.home_score || 0) + (m.away_score || 0) > 0;
+    const futureClass = (!isPlayed || (!hasGoals && viewingGW > DATA.current_gameweek && !isLivePreview)) ? ' match-future' : '';
+    const hs = m.home_scorers || [];
+    const as = m.away_scorers || [];
+    const renderScorers = names => {
+      const counts = {};
+      const order = [];
+      names.forEach(s => {
+        if (!(s in counts)) { counts[s] = 0; order.push(s); }
+        counts[s]++;
+      });
+      return order.map(s => {
+        const label = counts[s] > 1 ? `${s} (${counts[s]})` : s;
+        return s.indexOf('Own Goal') === 0
+          ? esc(label)
+          : `<span class="player-link" data-player="${esc(s)}">${esc(label)}</span>`;
+      }).join('<br>');
+    };
+    const scorerHtml = (hs.length || as.length) ? `
+      <div class="match-scorers">
+        <div class="home-scorers">${renderScorers(hs)}</div>
+        <div></div>
+        <div class="away-scorers">${renderScorers(as)}</div>
+      </div>` : '';
+    return `<div class="match-card${futureClass}">
+      <div class="match-row">
+        <div class="match-home"><span class="team-link" data-team="${esc(m.home)}">${esc(m.home)}</span></div>
+        <div class="match-score">${m.home_score !== null ? m.home_score : '-'}</div>
+        <div class="match-dash">v</div>
+        <div class="match-score">${m.away_score !== null ? m.away_score : '-'}</div>
+        <div class="match-away"><span class="team-link" data-team="${esc(m.away)}">${esc(m.away)}</span></div>
+      </div>
+      ${scorerHtml}
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('fixtures-list').addEventListener('click', e => {
+  const teamEl = e.target.closest('.team-link');
+  if (teamEl) { showTeam(teamEl.dataset.team); return; }
+  const playerEl = e.target.closest('.player-link');
+  if (playerEl) { showPlayerModal(playerEl.dataset.player); return; }
+});
+
+document.getElementById('teams-grid').addEventListener('click', e => {
+  const el = e.target.closest('.team-player');
+  if (!el) return;
+  showPlayerModal(el.dataset.player);
+});
+
+function changeGW(delta) {
+  viewingGW = Math.max(1, Math.min(38, viewingGW + delta));
+  renderFixtures();
+}
+
+/* TEAMS */
+function renderTeams() {
+  document.getElementById('teams-grid').innerHTML = DATA.teams.map((t, i) => {
+    const totalSpent = t.players.reduce((s, p) => s + p.cost, 0);
+    const posMap = { Defender: 'def', Midfielder: 'mid', Striker: 'str' };
+    const playersHtml = t.players.map(p => {
+      const tag = posMap[p.position] || 'mid';
+      return `<div class="team-player" data-player="${esc(p.name)}">
+        <div class="pos-tag ${tag}">${p.position.slice(0, 3).toUpperCase()}</div>
+        <div>${esc(p.name)}</div>
+        <div class="player-cost">£${p.cost}</div>
+      </div>`;
+    }).join('');
+    return `<div class="team-card" id="team-card-${i}">
+      <div class="team-card-name">${esc(t.name)}</div>
+      <div class="team-card-meta">SPENT £${totalSpent} · REMAINING £${t.budget_left}</div>
+      ${playersHtml}
+    </div>`;
+  }).join('');
+}
+
+function showTeam(teamName) {
+  const idx = DATA.teams.findIndex(t => t.name === teamName);
+  if (idx === -1) return;
+
+  document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
+  document.querySelector('#main-nav button[data-view="teams"]').classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-teams').classList.add('active');
+
+  const card = document.getElementById('team-card-' + idx);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.add('highlight');
+    setTimeout(() => card.classList.remove('highlight'), 2000);
+  }
+}
+
+/* PLAYER GOALS MODAL */
+function getPlayerGoalBreakdown(playerName) {
+  const entries = [];
+  let total = 0;
+  for (let gw = 1; gw <= DATA.current_gameweek; gw++) {
+    const matches = DATA.fixtures[String(gw)] || [];
+    for (const m of matches) {
+      const homeCount = (m.home_scorers || []).filter(s => s === playerName).length;
+      const awayCount = (m.away_scorers || []).filter(s => s === playerName).length;
+      if (homeCount > 0) { entries.push({ gw, opponent: m.away, count: homeCount }); total += homeCount; }
+      if (awayCount > 0) { entries.push({ gw, opponent: m.home, count: awayCount }); total += awayCount; }
+    }
+  }
+  entries.sort((a, b) => a.gw - b.gw);
+  return { entries, total };
+}
+
+function showPlayerModal(playerName) {
+  const { entries, total } = getPlayerGoalBreakdown(playerName);
+  document.getElementById('player-modal-name').textContent = playerName;
+  document.getElementById('player-modal-total').textContent =
+    total + (total === 1 ? ' goal' : ' goals') + ' this season';
+
+  const breakdownEl = document.getElementById('player-modal-breakdown');
+  if (entries.length === 0) {
+    breakdownEl.innerHTML = '<div style="color:var(--chalk-dim); font-size:.85rem; padding:8px 4px;">No goals scored yet.</div>';
+  } else {
+    breakdownEl.innerHTML = entries.map(e => `
+      <div class="goal-row">
+        <div class="gw-tag">GW${e.gw}</div>
+        <div>v ${esc(e.opponent)}</div>
+        <div class="goal-count">${e.count > 1 ? e.count + ' goals' : '1 goal'}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('player-modal-overlay').classList.add('active');
+}
+
+function closePlayerModal() {
+  document.getElementById('player-modal-overlay').classList.remove('active');
+}
+
+// Backdrop-click-to-close, guarded against firing on text-selection drags
+// that start inside the modal and release outside it.
+let playerModalMouseDownOnOverlay = false;
+document.getElementById('player-modal-overlay').addEventListener('mousedown', e => {
+  playerModalMouseDownOnOverlay = (e.target.id === 'player-modal-overlay');
+});
+document.getElementById('player-modal-overlay').addEventListener('click', e => {
+  if (e.target.id === 'player-modal-overlay' && playerModalMouseDownOnOverlay) closePlayerModal();
+  playerModalMouseDownOnOverlay = false;
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePlayerModal();
+});
+
+/* STATS */
+function renderStats() {
+  const playerSections = [
+    { key: 'defenders', title: 'Top Scoring Defenders' },
+    { key: 'midfielders', title: 'Top Scoring Midfielders' },
+    { key: 'strikers', title: 'Top Scoring Strikers' },
+  ];
+  const playerHtml = playerSections.map(s => {
+    const entries = (DATA.statistics[s.key] || []).slice(0, 10);
+    const rows = entries.map((e, i) => `
+      <div class="stat-row">
+        <div class="stat-rank">${i + 1}</div>
+        <div class="stat-name-block"><div class="stat-name">${esc(e.player)}</div><div class="stat-team">${esc(e.team)}</div></div>
+        <div class="stat-goals">${e.goals}</div>
+      </div>`).join('');
+    return `<div class="stats-section"><h3>${s.title}</h3>${rows}</div>`;
+  }).join('');
+
+  const teamGoalSections = [
+    { key: 'goalsFromDefence', title: 'Goals from Defence' },
+    { key: 'goalsFromMidfield', title: 'Goals from Midfield' },
+    { key: 'goalsFromStrikeforce', title: 'Goals from Strikeforce' },
+  ];
+  const teamGoalHtml = teamGoalSections.map(s => {
+    const entries = DATA.statistics[s.key] || [];
+    const rows = entries.map((e, i) => `
+      <div class="stat-row">
+        <div class="stat-rank">${i + 1}</div>
+        <div class="stat-name-block"><div class="stat-name">${esc(e.team)}</div></div>
+        <div class="stat-goals">${e.goals}</div>
+      </div>`).join('');
+    return `<div class="stats-section"><h3>${s.title}</h3>${rows}</div>`;
+  }).join('');
+
+  const teamCountSections = [
+    { field: 'clean_sheets', title: 'Clean Sheets' },
+    { field: 'goalless_weeks', title: 'Goalless Weeks' },
+  ];
+  const teamCountHtml = teamCountSections.map(s => {
+    const sorted = [...DATA.table].sort((a, b) => b[s.field] - a[s.field] || a.team.localeCompare(b.team));
+    const rows = sorted.map((e, i) => `
+      <div class="stat-row">
+        <div class="stat-rank">${i + 1}</div>
+        <div class="stat-name-block"><div class="stat-name">${esc(e.team)}</div></div>
+        <div class="stat-goals">${e[s.field]}</div>
+      </div>`).join('');
+    return `<div class="stats-section"><h3>${s.title}</h3>${rows}</div>`;
+  }).join('');
+
+  const mostImportant = DATA.statistics.mostImportantPlayers || [];
+  const mostImportantHtml = `<div class="stats-section mip-section"><h3>Most Important Players</h3>
+    <table class="mip-table">
+      <thead><tr><th></th><th>Player</th><th>Pts Earned</th><th>Pts/Goal</th></tr></thead>
+      <tbody>
+        ${mostImportant.slice(0, 10).map((e, i) => `
+          <tr>
+            <td class="stat-rank">${i + 1}</td>
+            <td><div>${esc(e.player)}</div><div class="stat-team">${esc(e.team)}</div></td>
+            <td class="stat-goals">${e.pointsEarned}</td>
+            <td class="stat-goals">${e.pointsPerGoal}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById('stats-grid').innerHTML = playerHtml + teamGoalHtml + teamCountHtml + mostImportantHtml;
+}
+
+/* STREAKS */
+const ALL_TIME_RECORDS = {
+  win: { value: 10, holder: 'Ryan Gregory (15/16)' },
+  draw: { value: 7, holder: 'Matthew Carver (13/14)' },
+  lose: { value: 10, holder: "Joe Pickover (20/21) & Adam Davey (22/23)" },
+  unbeaten: { value: 20, holder: 'Oli Major (18/19)' },
+  without_winning: { value: 24, holder: 'Joe Pickover (20/21)' },
+  scored: { value: 24, holder: 'Ryan Gregory (15/16)' },
+  blanked: { value: 11, holder: 'Ben Settle (24/25)' },
+  clean_sheet: { value: 8, holder: 'Matt Smith (17/18)' },
+  conceded: { value: 19, holder: 'Oli Major & Jonathan Crabb (20/21)' },
+  // No all-time BTTS record on file.
+};
+const STREAK_CATEGORIES = ['win', 'draw', 'lose', 'unbeaten', 'without_winning', 'scored', 'blanked', 'clean_sheet', 'conceded', 'btts'];
+const STREAK_LABELS = {
+  win: 'Win', draw: 'Draw', lose: 'Lose', unbeaten: 'Unbeaten', without_winning: 'Without Winning',
+  scored: 'Scored', blanked: 'Blanked', clean_sheet: 'Clean Sheet', conceded: 'Conceded', btts: 'BTTS',
+};
+
+// Shared renderer for both the Current Streaks and Max Streaks tables - highlights
+// whichever team currently leads each category, and flags any value that beats
+// the all-time record on file for that category.
+function renderStreakTable(tbodyId, rows) {
+  const leaders = {};
+  STREAK_CATEGORIES.forEach(cat => {
+    leaders[cat] = Math.max(0, ...rows.map(r => r[cat]));
+  });
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = rows.map(r => {
+    const cells = STREAK_CATEGORIES.map(cat => {
+      const val = r[cat];
+      const record = ALL_TIME_RECORDS[cat];
+      const isRecordBroken = record && val > record.value;
+      const isLeader = val > 0 && val === leaders[cat];
+      const cls = isRecordBroken ? 'streak-record-broken' : (isLeader ? 'streak-leader' : '');
+      const icon = isRecordBroken ? '🏆 ' : '';
+      return `<td class="${cls}">${icon}${val}</td>`;
+    }).join('');
+    return `<tr><td class="team-name">${esc(r.team)}</td>${cells}</tr>`;
+  }).join('');
+}
+
+function renderStreaks() {
+  renderStreakTable('streaks-body', DATA.streaks.current || []);
+}
+
+function renderMaxStreaks() {
+  renderStreakTable('max-streaks-body', DATA.maxStreaks || []);
+}
+
+function renderRecordHolders() {
+  const tbody = document.getElementById('record-holders-body');
+  tbody.innerHTML = Object.keys(ALL_TIME_RECORDS).map(cat => {
+    const r = ALL_TIME_RECORDS[cat];
+    return `<tr><td class="team-name">${esc(STREAK_LABELS[cat])}</td><td>${r.value}</td><td>${esc(r.holder)}</td></tr>`;
+  }).join('');
+}
+
+/* LUCK */
+let luckSortKey = 'positionActual';
+let luckSortDir = 'asc';
+
+function renderLuck() {
+  const tbody = document.getElementById('luck-body');
+  const luck = (DATA.luck || []).slice();
+  luck.sort((a, b) => {
+    const av = a[luckSortKey], bv = b[luckSortKey];
+    let cmp;
+    if (typeof av === 'string') cmp = av.localeCompare(bv);
+    else cmp = av - bv;
+    return luckSortDir === 'asc' ? cmp : -cmp;
+  });
+  tbody.innerHTML = luck.map(r => `<tr>
+    <td class="team-name">${esc(r.team)}</td>
+    <td>${r.pointsCalculated}</td><td>${r.pointsActual}</td>
+    <td class="${r.pointsLuck < 0 ? 'luck-negative' : ''}">${r.pointsLuck > 0 ? '+' : ''}${r.pointsLuck}</td>
+    <td>${r.pointsLuckRank}</td>
+    <td>${r.positionCalculated}</td><td>${r.positionActual}</td>
+    <td class="${r.positionLuck < 0 ? 'luck-negative' : ''}">${r.positionLuck > 0 ? '+' : ''}${r.positionLuck}</td>
+    <td>${r.positionLuckRank}</td>
+  </tr>`).join('');
+
+  document.querySelectorAll('#luck-table th[data-sort]').forEach(th => {
+    const isActive = th.dataset.sort === luckSortKey;
+    th.classList.toggle('sorted', isActive);
+    const arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = isActive ? (luckSortDir === 'asc' ? '▲' : '▼') : '';
+  });
+}
+
+document.getElementById('luck-table').addEventListener('click', e => {
+  const th = e.target.closest('th[data-sort]');
+  if (!th) return;
+  const key = th.dataset.sort;
+  const ascendingByDefault = new Set(['positionCalculated', 'positionActual', 'pointsLuckRank', 'positionLuckRank']);
+  if (luckSortKey === key) {
+    luckSortDir = luckSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    luckSortKey = key;
+    luckSortDir = ascendingByDefault.has(key) ? 'asc' : 'desc';
+  }
+  renderLuck();
+});
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ============================= LIVE FPL UPDATES ============================= */
+
+// Fill this in with your deployed Cloudflare Worker relay URL, e.g.
+// 'https://fpl-relay.yourname.workers.dev'
+const RELAY_URL = 'https://fpl-relay.laurencegriffiths1.workers.dev';
+let liveGameweekPreview = null;
+
+function normalizeName(s) {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function buildFplIndex(bootstrapElements) {
+  return bootstrapElements.map(el => {
+    const full = normalizeName((el.first_name || '') + ' ' + (el.second_name || ''));
+    const tokens = full.split(' ').filter(Boolean);
+    return {
+      id: el.id,
+      norm_full: full,
+      first_initial: tokens[0] ? tokens[0][0] : '',
+      last_token: tokens.length ? tokens[tokens.length - 1] : full,
+    };
+  });
+}
+
+function matchPlayerToFplId(rosterName, fplIndex) {
+  const norm = normalizeName(rosterName);
+  const tokens = norm.split(' ').filter(Boolean);
+  const firstInitial = tokens[0] ? tokens[0][0] : '';
+  const lastToken = tokens.length ? tokens[tokens.length - 1] : norm;
+
+  const exact = fplIndex.filter(p => p.norm_full === norm);
+  if (exact.length === 1) return exact[0].id;
+  if (exact.length > 1) return null;
+
+  if (tokens.length === 1) {
+    const mono = fplIndex.filter(p => p.last_token === lastToken);
+    return mono.length === 1 ? mono[0].id : null;
+  }
+
+  const both = fplIndex.filter(p => p.last_token === lastToken && p.first_initial === firstInitial);
+  return both.length === 1 ? both[0].id : null;
+}
+
+function buildTeamsRosterMap() {
+  const map = {};
+  DATA.teams.forEach(t => { map[t.name] = t.players.map(p => p.name); });
+  return map;
+}
+
+function computeGameweekResult(fixture, teamsRosterMap, liveDataMap, fplIndex) {
+  // liveDataMap: { fplId: { goals, ownGoals } }
+  function rosterStats(teamName) {
+    const roster = teamsRosterMap[teamName] || [];
+    let goals = 0;
+    const scorers = [];
+    const ownGoalsScored = []; // own goals BY this roster's players - these benefit the OPPONENT
+    for (const playerName of roster) {
+      const fplId = matchPlayerToFplId(playerName, fplIndex);
+      if (fplId === null) continue;
+      const stat = liveDataMap[fplId] || { goals: 0, ownGoals: 0 };
+      for (let i = 0; i < stat.goals; i++) { scorers.push(playerName); goals++; }
+      for (let i = 0; i < stat.ownGoals; i++) { ownGoalsScored.push(playerName); }
+    }
+    return { goals, scorers, ownGoalsScored };
+  }
+  const home = rosterStats(fixture.home);
+  const away = rosterStats(fixture.away);
+
+  // An own goal by a player on YOUR roster is a bonus goal for whoever you're
+  // facing this gameweek, not for you - and not scored by anyone on their roster.
+  const home_score = home.goals + away.ownGoalsScored.length;
+  const away_score = away.goals + home.ownGoalsScored.length;
+  const home_scorers = home.scorers.concat(away.ownGoalsScored.map(n => 'Own Goal (' + n + ')'));
+  const away_scorers = away.scorers.concat(home.ownGoalsScored.map(n => 'Own Goal (' + n + ')'));
+
+  return {
+    home: fixture.home, away: fixture.away,
+    home_score: home_score, away_score: away_score,
+    home_scorers: home_scorers, away_scorers: away_scorers,
+  };
+}
+
+function recomputeTable() {
+  const stats = {};
+  DATA.teams.forEach(t => {
+    stats[t.name] = { team: t.name, played: 0, won: 0, drawn: 0, lost: 0, goals_for: 0, goals_against: 0, points: 0, clean_sheets: 0, goalless_weeks: 0 };
+  });
+  for (let gw = 1; gw <= DATA.current_gameweek; gw++) {
+    const matches = DATA.fixtures[String(gw)] || [];
+    for (const m of matches) {
+      if (m.home_score === null || m.away_score === null) continue;
+      const h = stats[m.home], a = stats[m.away];
+      if (!h || !a) continue;
+      h.played++; a.played++;
+      h.goals_for += m.home_score; h.goals_against += m.away_score;
+      a.goals_for += m.away_score; a.goals_against += m.home_score;
+      if (m.away_score === 0) h.clean_sheets++;
+      if (m.home_score === 0) a.clean_sheets++;
+      if (m.home_score === 0) h.goalless_weeks++;
+      if (m.away_score === 0) a.goalless_weeks++;
+      if (m.home_score > m.away_score) { h.won++; a.lost++; h.points += 3; }
+      else if (m.home_score < m.away_score) { a.won++; h.lost++; a.points += 3; }
+      else { h.drawn++; a.drawn++; h.points += 1; a.points += 1; }
+    }
+  }
+  const table = Object.values(stats).map(s => ({ ...s, goal_diff: s.goals_for - s.goals_against }));
+  table.sort((x, y) => y.points - x.points || y.goal_diff - x.goal_diff || y.goals_for - x.goals_for || x.team.localeCompare(y.team));
+  table.forEach((r, i) => { r.position = i + 1; });
+  DATA.table = table;
+}
+
+function buildTeamMatchHistory() {
+  const history = {};
+  DATA.teams.forEach(t => { history[t.name] = []; });
+  for (let gw = 1; gw <= DATA.current_gameweek; gw++) {
+    const matches = DATA.fixtures[String(gw)] || [];
+    for (const m of matches) {
+      if (m.home_score === null || m.away_score === null) continue;
+      if (history[m.home]) history[m.home].push({ gf: m.home_score, ga: m.away_score });
+      if (history[m.away]) history[m.away].push({ gf: m.away_score, ga: m.home_score });
+    }
+  }
+  return history;
+}
+
+function recomputeStreaks() {
+  const history = buildTeamMatchHistory();
+
+  // Count backward from the most recent match while a condition holds.
+  function currentStreak(matches, holds) {
+    let count = 0;
+    for (let i = matches.length - 1; i >= 0; i--) {
+      if (holds(matches[i])) count++; else break;
+    }
+    return count;
+  }
+
+  const current = DATA.teams.map(t => {
+    const matches = history[t.name];
+    return {
+      team: t.name,
+      win: currentStreak(matches, m => m.gf > m.ga),
+      draw: currentStreak(matches, m => m.gf === m.ga),
+      lose: currentStreak(matches, m => m.gf < m.ga),
+      unbeaten: currentStreak(matches, m => m.gf >= m.ga),
+      without_winning: currentStreak(matches, m => m.gf <= m.ga),
+      scored: currentStreak(matches, m => m.gf > 0),
+      blanked: currentStreak(matches, m => m.gf === 0),
+      clean_sheet: currentStreak(matches, m => m.ga === 0),
+      conceded: currentStreak(matches, m => m.ga > 0),
+      btts: currentStreak(matches, m => m.gf > 0 && m.ga > 0),
+    };
+  });
+
+  DATA.streaks = { current };
+}
+
+function recomputeMaxStreaks() {
+  const history = buildTeamMatchHistory();
+
+  // Longest unbroken run anywhere in the team's history so far this season,
+  // not just the run that's still going right now.
+  function longestStreak(matches, holds) {
+    let max = 0, run = 0;
+    for (const m of matches) {
+      if (holds(m)) { run++; if (run > max) max = run; }
+      else { run = 0; }
+    }
+    return max;
+  }
+
+  DATA.maxStreaks = DATA.teams.map(t => {
+    const matches = history[t.name];
+    return {
+      team: t.name,
+      win: longestStreak(matches, m => m.gf > m.ga),
+      draw: longestStreak(matches, m => m.gf === m.ga),
+      lose: longestStreak(matches, m => m.gf < m.ga),
+      unbeaten: longestStreak(matches, m => m.gf >= m.ga),
+      without_winning: longestStreak(matches, m => m.gf <= m.ga),
+      scored: longestStreak(matches, m => m.gf > 0),
+      blanked: longestStreak(matches, m => m.gf === 0),
+      clean_sheet: longestStreak(matches, m => m.ga === 0),
+      conceded: longestStreak(matches, m => m.ga > 0),
+      btts: longestStreak(matches, m => m.gf > 0 && m.ga > 0),
+    };
+  });
+}
+
+function recomputeMostImportantPlayers() {
+  // For each goal a player scores, how many league points did that goal
+  // swing for their team? (actual result points minus what the result
+  // would have been with that player's goals subtracted from their team's
+  // score that gameweek, opponent's score unchanged.) Own goals aren't
+  // counted here - only a player's own personal goals.
+  const playerStats = {};
+  DATA.teams.forEach(t => {
+    t.players.forEach(p => {
+      playerStats[p.name + '@' + t.name] = { player: p.name, team: t.name, goals: 0, pointsEarned: 0 };
+    });
+  });
+
+  function resultPoints(teamScore, oppScore) {
+    return teamScore > oppScore ? 3 : (teamScore === oppScore ? 1 : 0);
+  }
+
+  function processSide(teamName, teamScore, oppScore, scorers) {
+    const goalCounts = {};
+    (scorers || []).forEach(s => {
+      if (s.indexOf('Own Goal') === 0) return; // exclude own goals from personal credit
+      goalCounts[s] = (goalCounts[s] || 0) + 1;
+    });
+    const actualPoints = resultPoints(teamScore, oppScore);
+    Object.entries(goalCounts).forEach(([playerName, count]) => {
+      const key = playerName + '@' + teamName;
+      if (!playerStats[key]) return;
+      const withoutPlayerPoints = resultPoints(teamScore - count, oppScore);
+      playerStats[key].goals += count;
+      playerStats[key].pointsEarned += (actualPoints - withoutPlayerPoints);
+    });
+  }
+
+  for (let gw = 1; gw <= DATA.current_gameweek; gw++) {
+    const matches = DATA.fixtures[String(gw)] || [];
+    for (const m of matches) {
+      if (m.home_score === null || m.away_score === null) continue;
+      processSide(m.home, m.home_score, m.away_score, m.home_scorers);
+      processSide(m.away, m.away_score, m.home_score, m.away_scorers);
+    }
+  }
+
+  const list = Object.values(playerStats)
+    .filter(p => p.goals > 0)
+    .map(p => ({ ...p, pointsPerGoal: Math.round((p.pointsEarned / p.goals) * 100) / 100 }));
+  list.sort((a, b) => b.pointsEarned - a.pointsEarned || b.pointsPerGoal - a.pointsPerGoal);
+
+  DATA.statistics.mostImportantPlayers = list;
+}
+
+function teamScoreInGameweek(teamName, gw) {
+  const matches = DATA.fixtures[String(gw)] || [];
+  for (const m of matches) {
+    if (m.home === teamName) return m.home_score;
+    if (m.away === teamName) return m.away_score;
+  }
+  return null;
+}
+
+function luckResultPoints(g, opp) {
+  return g > opp ? 3 : (g === opp ? 1 : 0);
+}
+
+// For one half of the season (a single round-robin block, so each team plays
+// every other team exactly once), work out "calculated" points: for every
+// fixture a team actually played, take their own goal tally from that game
+// and see what points they'd have averaged against their opponent's actual
+// score in every gameweek played so far in this block (not just the week
+// they met) - this answers "how did my output compare to what this specific
+// opponent generally produced this half", averaged, then summed across every
+// opponent played to get a total comparable to real points.
+function computeLuckForBlock(teamName, blockStart, blockEnd) {
+  const playedWeeks = [];
+  for (let gw = blockStart; gw <= blockEnd; gw++) {
+    if (gw > DATA.current_gameweek) break;
+    playedWeeks.push(gw);
+  }
+  let calculatedPoints = 0;
+  let actualPoints = 0;
+
+  for (const gw of playedWeeks) {
+    const matches = DATA.fixtures[String(gw)] || [];
+    const match = matches.find(m => m.home === teamName || m.away === teamName);
+    if (!match) continue;
+    const isHome = match.home === teamName;
+    const myScore = isHome ? match.home_score : match.away_score;
+    const oppScore = isHome ? match.away_score : match.home_score;
+    const opponent = isHome ? match.away : match.home;
+    if (myScore === null || oppScore === null) continue;
+
+    actualPoints += luckResultPoints(myScore, oppScore);
+
+    let sumHyp = 0, count = 0;
+    for (const gw2 of playedWeeks) {
+      const oppScoreThatWeek = teamScoreInGameweek(opponent, gw2);
+      if (oppScoreThatWeek === null) continue;
+      sumHyp += luckResultPoints(myScore, oppScoreThatWeek);
+      count++;
+    }
+    calculatedPoints += count > 0 ? (sumHyp / count) : 0;
+  }
+
+  return { calculatedPoints, actualPoints };
+}
+
+function recomputeLuck() {
+  const results = DATA.teams.map(t => {
+    const block1 = computeLuckForBlock(t.name, 1, 19);
+    const block2 = computeLuckForBlock(t.name, 20, 38);
+    const pointsCalculated = block1.calculatedPoints + block2.calculatedPoints;
+    const pointsActual = block1.actualPoints + block2.actualPoints;
+    const tableRow = DATA.table.find(r => r.team === t.name);
+    return {
+      team: t.name,
+      pointsCalculated: Math.round(pointsCalculated * 100) / 100,
+      pointsActual,
+      pointsLuck: Math.round((pointsCalculated - pointsActual) * 100) / 100,
+      positionActual: tableRow ? tableRow.position : null,
+    };
+  });
+
+  // "Calculated position" - rank teams by calculated points the same way
+  // the real table ranks by actual points (ties broken alphabetically, since
+  // a calculated goal difference isn't a meaningful concept here).
+  const byCalculated = [...results].sort((a, b) => b.pointsCalculated - a.pointsCalculated || a.team.localeCompare(b.team));
+  byCalculated.forEach((r, i) => { r.positionCalculated = i + 1; });
+  results.forEach(r => { r.positionLuck = r.positionCalculated - r.positionActual; });
+
+  // Rank teams by how much luck they've had, in each metric independently.
+  const byPointsLuck = [...results].sort((a, b) => b.pointsLuck - a.pointsLuck);
+  byPointsLuck.forEach((r, i) => { r.pointsLuckRank = i + 1; });
+  const byPositionLuck = [...results].sort((a, b) => b.positionLuck - a.positionLuck);
+  byPositionLuck.forEach((r, i) => { r.positionLuckRank = i + 1; });
+
+  results.sort((a, b) => a.positionActual - b.positionActual);
+  DATA.luck = results;
+}
+
+async function fetchLeagueState() {
+  const resp = await fetch(RELAY_URL + '/league-state');
+  if (!resp.ok) throw new Error('Relay returned ' + resp.status);
+  return resp.json();
+}
+
+function setFplStatus(text, cls) {
+  const el = document.getElementById('fpl-status');
+  const textEl = document.getElementById('fpl-status-text');
+  if (textEl) textEl.textContent = text;
+  if (el) el.className = 'fpl-status' + (cls ? ' ' + cls : '');
+}
+
+// Best-effort surname for sorting, e.g. "Virgil van Dijk" -> "van Dijk" not "Dijk".
+const SURNAME_PARTICLES = new Set(['van', 'de', 'der', 'den', 'du', 'da', 'dos', 'das', 'le', 'di', 'von', 'al']);
+function getSurname(fullName) {
+  const words = fullName.trim().split(/\s+/);
+  if (words.length === 1) return words[0];
+  for (let i = 1; i < words.length; i++) {
+    if (SURNAME_PARTICLES.has(words[i].toLowerCase())) {
+      return words.slice(i).join(' ');
+    }
+  }
+  return words[words.length - 1];
+}
+
+function recomputeStatistics(playerIndex, fplIndex) {
+  const goalsById = {};
+  playerIndex.forEach(el => { goalsById[el.id] = el.goals_scored || 0; });
+
+  const byPosition = { Defender: [], Midfielder: [], Striker: [] };
+  DATA.teams.forEach(t => {
+    t.players.forEach(p => {
+      const fplId = matchPlayerToFplId(p.name, fplIndex);
+      const goals = fplId !== null ? (goalsById[fplId] || 0) : 0;
+      if (byPosition[p.position]) {
+        byPosition[p.position].push({ player: p.name, team: t.name, goals });
+      }
+    });
+  });
+
+  Object.keys(byPosition).forEach(pos => {
+    byPosition[pos].sort((a, b) => b.goals - a.goals || getSurname(a.player).localeCompare(getSurname(b.player)));
+  });
+
+  DATA.statistics = {
+    defenders: byPosition.Defender,
+    midfielders: byPosition.Midfielder,
+    strikers: byPosition.Striker,
+  };
+
+  // Team-level totals per position, derived from the same per-player lists.
+  function sumByTeam(playerList) {
+    const totals = {};
+    DATA.teams.forEach(t => { totals[t.name] = 0; });
+    playerList.forEach(p => { totals[p.team] = (totals[p.team] || 0) + p.goals; });
+    return Object.entries(totals)
+      .map(([team, goals]) => ({ team, goals }))
+      .sort((a, b) => b.goals - a.goals);
+  }
+  DATA.statistics.goalsFromDefence = sumByTeam(byPosition.Defender);
+  DATA.statistics.goalsFromMidfield = sumByTeam(byPosition.Midfielder);
+  DATA.statistics.goalsFromStrikeforce = sumByTeam(byPosition.Striker);
+}
+
+let fplUpdateInProgress = false;
+
+async function runFplUpdate() {
+  if (!RELAY_URL || RELAY_URL.indexOf('__RELAY_URL') === 0) {
+    setFplStatus('Live updates not configured yet (no relay URL set).', 'error');
+    return;
+  }
+  if (fplUpdateInProgress) return; // an update is already running - avoid two racing at once
+  fplUpdateInProgress = true;
+  setFplStatus('Checking for new results...', '');
+  try {
+    // One request gets everything: every finished gameweek's goals (cached
+    // server-side, so this is fast even deep into the season), the live
+    // in-progress gameweek, and season-cumulative goals for Statistics.
+    const state = await fetchLeagueState();
+    const fplIndex = buildFplIndex(state.playerIndex);
+    const teamsRosterMap = buildTeamsRosterMap();
+
+    recomputeStatistics(state.playerIndex, fplIndex);
+    renderStats();
+
+    let updatedAny = false;
+
+    for (let gw = DATA.current_gameweek + 1; gw <= state.latestFinished; gw++) {
+      const goalsMap = state.finishedGameweeks[String(gw)] || {};
+      const fixturesThisWeek = DATA.fixtures[String(gw)] || [];
+      DATA.fixtures[String(gw)] = fixturesThisWeek.map(fx =>
+        computeGameweekResult(fx, teamsRosterMap, goalsMap, fplIndex)
+      );
+      DATA.current_gameweek = gw;
+      updatedAny = true;
+    }
+
+    if (updatedAny) {
+      recomputeTable();
+      recomputeStreaks();
+      recomputeMaxStreaks();
+      recomputeMostImportantPlayers();
+      recomputeLuck();
+      renderTable();
+      renderFixtures();
+      renderStreaks();
+      renderMaxStreaks();
+      renderRecordHolders();
+      renderStats();
+      renderLuck();
+      document.getElementById('current-gw').textContent = DATA.current_gameweek;
+    }
+
+    // Show the in-progress gameweek live, without locking it into the table yet
+    if (state.currentGameweekLive && state.currentGameweekLive.gw === DATA.current_gameweek + 1) {
+      const fixturesThisWeek = (DATA.fixtures[String(state.currentGameweekLive.gw)] || []).map(fx =>
+        computeGameweekResult(fx, teamsRosterMap, state.currentGameweekLive.goals, fplIndex)
+      );
+      liveGameweekPreview = { gw: state.currentGameweekLive.gw, fixtures: fixturesThisWeek };
+      if (viewingGW === state.currentGameweekLive.gw) renderFixtures();
+    }
+
+    setFplStatus('Up to date — through Gameweek ' + DATA.current_gameweek +
+      (liveGameweekPreview ? ' (GW ' + liveGameweekPreview.gw + ' live)' : ''), 'ok');
+  } catch (err) {
+    setFplStatus('Could not reach FPL data — showing last saved results. (' + err.message + ')', 'error');
+  } finally {
+    fplUpdateInProgress = false;
+  }
+}
+
+function manualRefresh() {
+  runFplUpdate();
+}
+
+/* INIT */
+renderTable();
+renderFixtures();
+renderTeams();
+renderStats();
+renderStreaks();
+renderMaxStreaks();
+renderRecordHolders();
+renderLuck();
+runFplUpdate();
+</script>
+</body>
+</html>
