@@ -130,7 +130,7 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .stat-team{font-size:.72rem;color:var(--chalk-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .stat-goals{font-family:var(--font-mono);font-weight:700;color:var(--gold);}
 
-.mip-section{grid-column:1/-1;}
+.mip-section{}
 .mip-table{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:fixed;}
 .mip-table th{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:.65rem;color:var(--chalk-dim);text-align:center;padding:6px 4px;border-bottom:2px solid var(--border);}
 .mip-table th:nth-child(1),.mip-table td:nth-child(1){width:24px;}
@@ -159,7 +159,7 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 #record-holders-table td:nth-child(2){font-family:var(--font-mono);color:var(--gold);font-weight:700;text-align:center;}
 #record-holders-table td:nth-child(3){color:var(--chalk-dim);font-size:.8rem;white-space:normal;}
 
-#luck-table{border-collapse:separate;border-spacing:0;table-layout:fixed;width:680px;}
+#luck-table{border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:680px;width:100%;}
 #luck-table thead th.sticky-team-col,#luck-table td:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #luck-table th,#luck-table td{white-space:nowrap;padding:8px 14px;}
 #luck-table td:first-child{text-align:left;position:sticky;left:0;background:var(--panel);z-index:1;}
@@ -397,13 +397,14 @@ function renderTable() {
 
 /* FIXTURES */
 function renderFixtures() {
-  const isLivePreview = liveGameweekPreview && liveGameweekPreview.gw === viewingGW;
-  const matches = isLivePreview ? liveGameweekPreview.fixtures : (DATA.fixtures[String(viewingGW)] || []);
-  document.getElementById('gw-label').textContent = 'Gameweek ' + viewingGW + (isLivePreview ? ' (LIVE)' : '');
-  const isPlayed = viewingGW <= DATA.current_gameweek || isLivePreview;
+  const isLiveGameweek = DATA.finishedGameweek !== undefined &&
+    viewingGW === DATA.current_gameweek && DATA.current_gameweek > DATA.finishedGameweek;
+  const matches = DATA.fixtures[String(viewingGW)] || [];
+  document.getElementById('gw-label').textContent = 'Gameweek ' + viewingGW + (isLiveGameweek ? ' (LIVE)' : '');
+  const isPlayed = viewingGW <= DATA.current_gameweek;
   document.getElementById('fixtures-list').innerHTML = matches.map(m => {
     const hasGoals = (m.home_score || 0) + (m.away_score || 0) > 0;
-    const futureClass = (!isPlayed || (!hasGoals && viewingGW > DATA.current_gameweek && !isLivePreview)) ? ' match-future' : '';
+    const futureClass = (!isPlayed || (!hasGoals && viewingGW > DATA.current_gameweek)) ? ' match-future' : '';
     const hs = m.home_scorers || [];
     const as = m.away_scorers || [];
     const renderScorers = names => {
@@ -734,10 +735,11 @@ function esc(str) {
 // Fill this in with your deployed Cloudflare Worker relay URL, e.g.
 // 'https://fpl-relay.yourname.workers.dev'
 const RELAY_URL = 'https://fpl-relay.laurencegriffiths1.workers.dev';
-let liveGameweekPreview = null;
 
 function normalizeName(s) {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[ıİ]/g, 'i').replace(/[ğĞ]/g, 'g').replace(/[şŞ]/g, 's')
+    .replace(/[øØ]/g, 'o').replace(/[đĐ]/g, 'd')
     .toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
@@ -761,12 +763,11 @@ function matchPlayerToFplId(rosterName, fplIndex) {
   const lastToken = tokens.length ? tokens[tokens.length - 1] : norm;
 
   const exact = fplIndex.filter(p => p.norm_full === norm);
-  if (exact.length === 1) return exact[0].id;
-  if (exact.length > 1) return null;
+  if (exact.length >= 1) return exact[0].id;
 
   if (tokens.length === 1) {
     const mono = fplIndex.filter(p => p.last_token === lastToken);
-    return mono.length === 1 ? mono[0].id : null;
+    return mono.length >= 1 ? mono[0].id : null;
   }
 
   const both = fplIndex.filter(p => p.last_token === lastToken && p.first_initial === firstInitial);
@@ -1141,47 +1142,55 @@ async function runFplUpdate() {
     const teamsRosterMap = buildTeamsRosterMap();
 
     recomputeStatistics(state.playerIndex, fplIndex);
-    renderStats();
 
-    let updatedAny = false;
+    // DATA.finishedGameweek only ever advances once FPL marks a gameweek
+    // finished - it's the stable boundary that decides what to fetch next
+    // time, and it never includes provisional/live data.
+    if (DATA.finishedGameweek === undefined) DATA.finishedGameweek = DATA.current_gameweek || 0;
 
-    for (let gw = DATA.current_gameweek + 1; gw <= state.latestFinished; gw++) {
+    for (let gw = DATA.finishedGameweek + 1; gw <= state.latestFinished; gw++) {
       const goalsMap = state.finishedGameweeks[String(gw)] || {};
       const fixturesThisWeek = DATA.fixtures[String(gw)] || [];
       DATA.fixtures[String(gw)] = fixturesThisWeek.map(fx =>
         computeGameweekResult(fx, teamsRosterMap, goalsMap, fplIndex)
       );
-      DATA.current_gameweek = gw;
-      updatedAny = true;
+      DATA.finishedGameweek = gw;
     }
 
-    if (updatedAny) {
-      recomputeTable();
-      recomputeStreaks();
-      recomputeMaxStreaks();
-      recomputeMostImportantPlayers();
-      recomputeLuck();
-      renderTable();
-      renderFixtures();
-      renderStreaks();
-      renderMaxStreaks();
-      renderRecordHolders();
-      renderStats();
-      renderLuck();
-      document.getElementById('current-gw').textContent = DATA.current_gameweek;
-    }
-
-    // Show the in-progress gameweek live, without locking it into the table yet
-    if (state.currentGameweekLive && state.currentGameweekLive.gw === DATA.current_gameweek + 1) {
-      const fixturesThisWeek = (DATA.fixtures[String(state.currentGameweekLive.gw)] || []).map(fx =>
+    // If a gameweek is currently in progress, fold its live score into the
+    // same fixtures data too - provisional, recomputed fresh every update,
+    // but visible everywhere (table, stats, streaks, luck, the per-player
+    // goal popup), not just on the Fixtures tab.
+    let liveGW = null;
+    if (state.currentGameweekLive && state.currentGameweekLive.gw === DATA.finishedGameweek + 1) {
+      liveGW = state.currentGameweekLive.gw;
+      const fixturesThisWeek = DATA.fixtures[String(liveGW)] || [];
+      DATA.fixtures[String(liveGW)] = fixturesThisWeek.map(fx =>
         computeGameweekResult(fx, teamsRosterMap, state.currentGameweekLive.goals, fplIndex)
       );
-      liveGameweekPreview = { gw: state.currentGameweekLive.gw, fixtures: fixturesThisWeek };
-      if (viewingGW === state.currentGameweekLive.gw) renderFixtures();
     }
 
+    // Everything below (table, streaks, luck, stats, the goal popup) uses
+    // DATA.current_gameweek as "how far has the season got" - so it should
+    // include the live gameweek if there is one, not just finished ones.
+    DATA.current_gameweek = liveGW || DATA.finishedGameweek;
+
+    recomputeTable();
+    recomputeStreaks();
+    recomputeMaxStreaks();
+    recomputeMostImportantPlayers();
+    recomputeLuck();
+    renderTable();
+    renderFixtures();
+    renderStreaks();
+    renderMaxStreaks();
+    renderRecordHolders();
+    renderStats();
+    renderLuck();
+    document.getElementById('current-gw').textContent = DATA.current_gameweek;
+
     setFplStatus('Up to date — through Gameweek ' + DATA.current_gameweek +
-      (liveGameweekPreview ? ' (GW ' + liveGameweekPreview.gw + ' live)' : ''), 'ok');
+      (liveGW ? ' (LIVE)' : ''), 'ok');
   } catch (err) {
     setFplStatus('Could not reach FPL data — showing last saved results. (' + err.message + ')', 'error');
   } finally {
