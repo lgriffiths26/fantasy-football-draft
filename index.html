@@ -79,6 +79,13 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .gw-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;}
 .gw-nav button{background:var(--panel);border:1px solid var(--border);color:var(--chalk);font-family:var(--font-display);text-transform:uppercase;font-size:.8rem;padding:8px 16px;border-radius:5px;cursor:pointer;}
 .gw-nav button:hover{background:var(--panel2);}
+
+.form-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:16px;font-size:.8rem;color:var(--chalk-dim);}
+.form-controls label{display:flex;align-items:center;gap:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:.03em;font-size:.75rem;}
+.form-controls select{background:var(--panel);border:1px solid var(--border);color:var(--chalk);font-family:var(--font-mono);font-size:.8rem;padding:5px 8px;border-radius:5px;cursor:pointer;}
+.form-controls button{background:var(--panel);border:1px solid var(--border);color:var(--chalk);font-family:var(--font-display);text-transform:uppercase;font-size:.75rem;padding:7px 14px;border-radius:5px;cursor:pointer;}
+.form-controls button:hover{background:var(--panel2);}
+.form-range-label{font-family:var(--font-mono);color:var(--chalk-dim);margin-left:auto;}
 .gw-label{font-family:var(--font-display);font-size:1.1rem;color:var(--gold);min-width:140px;text-align:center;}
 .match-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;padding:14px 16px;}
 .match-row{display:grid;grid-template-columns:1fr auto 36px auto 1fr;align-items:center;gap:8px;}
@@ -129,6 +136,8 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .stat-rank{font-family:var(--font-mono);font-size:.7rem;color:var(--chalk-dim);text-align:center;}
 .stat-team{font-size:.72rem;color:var(--chalk-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .stat-goals{font-family:var(--font-mono);font-weight:700;color:var(--gold);}
+.stat-row-pct{grid-template-columns:22px minmax(0,1fr) 44px 50px;}
+.stat-pct{font-family:var(--font-mono);font-size:.72rem;color:var(--chalk-dim);text-align:right;}
 
 .mip-section{}
 .mip-table{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:fixed;}
@@ -188,6 +197,7 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
   </div>
   <nav id="main-nav">
     <button class="active" data-view="table">Table</button>
+    <button data-view="form">Form</button>
     <button data-view="fixtures">Fixtures</button>
     <button data-view="teams">Teams</button>
     <button data-view="stats">Statistics</button>
@@ -214,6 +224,26 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
         </table>
       </div>
       <div class="prize-sidebar" id="prize-grid"></div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section id="view-form" class="view">
+    <div class="section-title">Form Table</div>
+    <div class="form-controls">
+      <label>From <select id="form-gw-start"></select></label>
+      <label>To <select id="form-gw-end"></select></label>
+      <button type="button" id="form-reset-btn">Reset to default (last 10)</button>
+      <span class="form-range-label" id="form-range-label"></span>
+    </div>
+    <div class="table-wrap">
+      <table class="league" id="form-table">
+        <thead><tr>
+          <th class="pos-col">#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
+          <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+        </tr></thead>
+        <tbody id="form-table-body"></tbody>
+      </table>
     </div>
   </section>
 
@@ -395,6 +425,84 @@ function renderTable() {
   }).join('');
 }
 
+/* FORM TABLE */
+// "Last finished gameweek" — never the live in-progress one, so the Form
+// Table (unlike the main Table) never includes a gameweek that's still
+// being played out.
+function lastFinishedGW() {
+  return (DATA.finishedGameweek !== undefined ? DATA.finishedGameweek : DATA.current_gameweek) || 0;
+}
+
+function defaultFormRange() {
+  const end = lastFinishedGW();
+  const start = Math.max(1, end - 9); // last 10 gameweeks, inclusive
+  return { start, end };
+}
+
+let formGwStart = null;
+let formGwEnd = null;
+let formRangeUserSet = false; // true once the user picks their own range, until they hit Reset
+
+function populateFormGwSelectors(maxGw) {
+  const opts = [];
+  for (let gw = 1; gw <= Math.max(maxGw, 1); gw++) opts.push(`<option value="${gw}">GW${gw}</option>`);
+  const startSel = document.getElementById('form-gw-start');
+  const endSel = document.getElementById('form-gw-end');
+  startSel.innerHTML = opts.join('');
+  endSel.innerHTML = opts.join('');
+  startSel.value = formGwStart;
+  endSel.value = formGwEnd;
+}
+
+function renderFormTable() {
+  const maxGw = lastFinishedGW();
+
+  if (!formRangeUserSet || formGwStart === null || formGwEnd === null) {
+    const d = defaultFormRange();
+    formGwStart = d.start;
+    formGwEnd = d.end;
+  }
+  // Keep whatever the user picked in range as the season progresses.
+  formGwStart = Math.min(Math.max(1, formGwStart), Math.max(maxGw, 1));
+  formGwEnd = Math.min(Math.max(1, formGwEnd), Math.max(maxGw, 1));
+  if (formGwStart > formGwEnd) formGwStart = formGwEnd;
+
+  populateFormGwSelectors(maxGw);
+
+  const tbody = document.getElementById('form-table-body');
+  const label = document.getElementById('form-range-label');
+  if (maxGw < 1) {
+    tbody.innerHTML = '';
+    label.textContent = 'No completed gameweeks yet';
+    return;
+  }
+  const table = computeStandings(formGwStart, formGwEnd);
+  tbody.innerHTML = table.map(r => `<tr>
+      <td class="pos-col">${r.position}</td>
+      <td class="team-name">${esc(r.team)}</td>
+      <td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td>
+      <td>${r.goals_for}</td><td>${r.goals_against}</td>
+      <td>${r.goal_diff > 0 ? '+' + r.goal_diff : r.goal_diff}</td>
+      <td class="pts-col">${r.points}</td>
+    </tr>`).join('');
+  label.textContent = `Showing GW${formGwStart} – GW${formGwEnd}`;
+}
+
+document.getElementById('form-gw-start').addEventListener('change', e => {
+  formGwStart = parseInt(e.target.value, 10);
+  formRangeUserSet = true;
+  renderFormTable();
+});
+document.getElementById('form-gw-end').addEventListener('change', e => {
+  formGwEnd = parseInt(e.target.value, 10);
+  formRangeUserSet = true;
+  renderFormTable();
+});
+document.getElementById('form-reset-btn').addEventListener('click', () => {
+  formRangeUserSet = false;
+  renderFormTable();
+});
+
 /* FIXTURES */
 function renderFixtures() {
   const isLiveGameweek = DATA.finishedGameweek !== undefined &&
@@ -575,14 +683,28 @@ function renderStats() {
     { key: 'goalsFromMidfield', title: 'Goals from Midfield' },
     { key: 'goalsFromStrikeforce', title: 'Goals from Strikeforce' },
   ];
+  // Each team's total roster goals across all three position groups, so we
+  // can show what share of a team's goals came from each one.
+  const teamTotalGoals = {};
+  DATA.teams.forEach(t => { teamTotalGoals[t.name] = 0; });
+  teamGoalSections.forEach(s => {
+    (DATA.statistics[s.key] || []).forEach(e => {
+      teamTotalGoals[e.team] = (teamTotalGoals[e.team] || 0) + e.goals;
+    });
+  });
   const teamGoalHtml = teamGoalSections.map(s => {
     const entries = DATA.statistics[s.key] || [];
-    const rows = entries.map((e, i) => `
-      <div class="stat-row">
+    const rows = entries.map((e, i) => {
+      const total = teamTotalGoals[e.team] || 0;
+      const pct = total > 0 ? Math.round((e.goals / total) * 100) : 0;
+      return `
+      <div class="stat-row stat-row-pct">
         <div class="stat-rank">${i + 1}</div>
         <div class="stat-name-block"><div class="stat-name">${esc(e.team)}</div></div>
         <div class="stat-goals">${e.goals}</div>
-      </div>`).join('');
+        <div class="stat-pct">${pct}%</div>
+      </div>`;
+    }).join('');
     return `<div class="stats-section"><h3>${s.title}</h3>${rows}</div>`;
   }).join('');
 
@@ -623,7 +745,7 @@ function renderStats() {
 /* STREAKS */
 const ALL_TIME_RECORDS = {
   win: { value: 10, holder: 'Ryan Gregory (15/16)' },
-  draw: { value: 7, holder: 'Matthew Carver (13/14)' },
+  draw: { value: 8, holder: 'Steven Hadfield (25/26)' },
   lose: { value: 10, holder: "Joe Pickover (20/21) & Adam Davey (22/23)" },
   unbeaten: { value: 20, holder: 'Oli Major (18/19)' },
   without_winning: { value: 24, holder: 'Joe Pickover (20/21)' },
@@ -783,12 +905,15 @@ function computeGameweekResult(fixture, teamsRosterMap, liveDataMap) {
   };
 }
 
-function recomputeTable() {
+// Builds a standings table from scratch using only fixtures in [startGW, endGW]
+// (inclusive). Shared by the season table (1..current_gameweek) and the Form
+// Table (an arbitrary, user-adjustable sub-range).
+function computeStandings(startGW, endGW) {
   const stats = {};
   DATA.teams.forEach(t => {
     stats[t.name] = { team: t.name, played: 0, won: 0, drawn: 0, lost: 0, goals_for: 0, goals_against: 0, points: 0, clean_sheets: 0, goalless_weeks: 0 };
   });
-  for (let gw = 1; gw <= DATA.current_gameweek; gw++) {
+  for (let gw = startGW; gw <= endGW; gw++) {
     const matches = DATA.fixtures[String(gw)] || [];
     for (const m of matches) {
       if (m.home_score === null || m.away_score === null) continue;
@@ -809,7 +934,11 @@ function recomputeTable() {
   const table = Object.values(stats).map(s => ({ ...s, goal_diff: s.goals_for - s.goals_against }));
   table.sort((x, y) => y.points - x.points || y.goal_diff - x.goal_diff || y.goals_for - x.goals_for || x.team.localeCompare(y.team));
   table.forEach((r, i) => { r.position = i + 1; });
-  DATA.table = table;
+  return table;
+}
+
+function recomputeTable() {
+  DATA.table = computeStandings(1, DATA.current_gameweek);
 }
 
 function buildTeamMatchHistory() {
@@ -1150,6 +1279,7 @@ async function runFplUpdate() {
     recomputeMostImportantPlayers();
     recomputeLuck();
     renderTable();
+    renderFormTable();
     renderFixtures();
     renderStreaks();
     renderMaxStreaks();
@@ -1173,6 +1303,7 @@ function manualRefresh() {
 
 /* INIT */
 renderTable();
+renderFormTable();
 renderFixtures();
 renderTeams();
 renderStats();
