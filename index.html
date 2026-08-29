@@ -74,6 +74,13 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .prize-amount{font-family:var(--font-mono);font-weight:700;color:var(--gold);}
 .prize-team{font-weight:600;}
 .table-badge{display:inline-block;font-size:.75rem;margin-right:4px;}
+.side-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;
+  background:var(--blue);color:var(--bg);
+  font-family:var(--font-mono);font-weight:700;font-size:.62rem;
+  margin-right:4px;vertical-align:middle;
+}
 
 /* FIXTURES */
 .gw-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;}
@@ -133,11 +140,11 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .stat-row{display:grid;grid-template-columns:22px minmax(0,1fr) 44px;gap:6px;align-items:center;padding:6px 4px;font-size:.82rem;border-bottom:1px solid rgba(45,90,62,.4);}
 .stat-name-block{min-width:0;}
 .stat-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.stat-row-pct{grid-template-columns:22px minmax(0,1fr) 44px 50px;}
+.stat-pct{font-family:var(--font-mono);font-size:.72rem;color:var(--chalk-dim);text-align:right;}
 .stat-rank{font-family:var(--font-mono);font-size:.7rem;color:var(--chalk-dim);text-align:center;}
 .stat-team{font-size:.72rem;color:var(--chalk-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .stat-goals{font-family:var(--font-mono);font-weight:700;color:var(--gold);}
-.stat-row-pct{grid-template-columns:22px minmax(0,1fr) 44px 50px;}
-.stat-pct{font-family:var(--font-mono);font-size:.72rem;color:var(--chalk-dim);text-align:right;}
 
 .mip-section{}
 .mip-table{width:100%;border-collapse:collapse;font-size:.82rem;table-layout:fixed;}
@@ -197,11 +204,11 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
   </div>
   <nav id="main-nav">
     <button class="active" data-view="table">Table</button>
-    <button data-view="form">Form</button>
-    <button data-view="fixtures">Fixtures</button>
     <button data-view="teams">Teams</button>
+    <button data-view="fixtures">Fixtures</button>
     <button data-view="stats">Statistics</button>
     <button data-view="streaks">Streaks</button>
+    <button data-view="form">Form</button>
     <button data-view="luck">Luck</button>
   </nav>
   <div id="fpl-status" class="fpl-status">
@@ -224,26 +231,6 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
         </table>
       </div>
       <div class="prize-sidebar" id="prize-grid"></div>
-    </div>
-  </section>
-
-  <!-- FORM -->
-  <section id="view-form" class="view">
-    <div class="section-title">Form Table</div>
-    <div class="form-controls">
-      <label>From <select id="form-gw-start"></select></label>
-      <label>To <select id="form-gw-end"></select></label>
-      <button type="button" id="form-reset-btn">Reset to default (last 10)</button>
-      <span class="form-range-label" id="form-range-label"></span>
-    </div>
-    <div class="table-wrap">
-      <table class="league" id="form-table">
-        <thead><tr>
-          <th class="pos-col">#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
-          <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
-        </tr></thead>
-        <tbody id="form-table-body"></tbody>
-      </table>
     </div>
   </section>
 
@@ -300,6 +287,26 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
       <table class="league" id="record-holders-table">
         <thead><tr><th>Category</th><th>Record</th><th>Held By</th></tr></thead>
         <tbody id="record-holders-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section id="view-form" class="view">
+    <div class="section-title">Form Table</div>
+    <div class="form-controls">
+      <label>From <select id="form-gw-start"></select></label>
+      <label>To <select id="form-gw-end"></select></label>
+      <button type="button" id="form-reset-btn">Reset to default (last 10)</button>
+      <span class="form-range-label" id="form-range-label"></span>
+    </div>
+    <div class="table-wrap">
+      <table class="league" id="form-table">
+        <thead><tr>
+          <th class="pos-col">#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
+          <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+        </tr></thead>
+        <tbody id="form-table-body"></tbody>
       </table>
     </div>
   </section>
@@ -364,12 +371,13 @@ function getPoolStandings(pool) {
 
 function renderPrizePool() {
   const grid = document.getElementById('prize-grid');
-  grid.innerHTML = Object.values(PRIZE_POOL).map(pool => {
+  grid.innerHTML = Object.entries(PRIZE_POOL).map(([key, pool]) => {
     const standings = getPoolStandings(pool);
     const rows = pool.amounts.map((amount, i) => {
       const entry = standings[i];
+      const medal = key === 'main' ? (MEDALS[i] || (i + 1) + '.') : `<span class="side-badge">${i + 1}</span>`;
       return `<div class="prize-row">
-        <div class="prize-medal">${MEDALS[i] || (i + 1) + '.'}</div>
+        <div class="prize-medal">${medal}</div>
         <div class="prize-team">${entry ? esc(entry.team) : '-'}</div>
         <div class="prize-amount">£${amount}</div>
       </div>`;
@@ -385,26 +393,56 @@ function renderPrizePool() {
 // For a given team, returns badge HTML for any prize positions it currently holds.
 function prizeBadgesFor(teamName) {
   let badges = '';
-  Object.values(PRIZE_POOL).forEach(pool => {
+  Object.entries(PRIZE_POOL).forEach(([key, pool]) => {
     const standings = getPoolStandings(pool);
     const idx = standings.findIndex(t => t.team === teamName);
-    if (idx !== -1) badges += `<span class="table-badge" title="${esc(pool.title)}">${MEDALS[idx] || ''}</span>`;
+    if (idx === -1) return;
+    if (key === 'main') {
+      badges += `<span class="table-badge" title="${esc(pool.title)}">${MEDALS[idx] || ''}</span>`;
+    } else {
+      badges += `<span class="table-badge side-badge" title="${esc(pool.title)}">${idx + 1}</span>`;
+    }
   });
   return badges;
 }
 
 let viewingGW = DATA.current_gameweek || 1;
+let userNavigatedFixtures = false; // once true, stop auto-following the live/latest gameweek
 
 document.getElementById('current-gw').textContent = DATA.current_gameweek;
 
 /* NAV */
+const ACTIVE_TAB_KEY = 'draftLeagueActiveTab';
+const VALID_TABS = ['table', 'fixtures', 'teams', 'stats', 'streaks', 'form', 'luck'];
+
+function getCurrentActiveView() {
+  const activeBtn = document.querySelector('#main-nav button.active');
+  return activeBtn ? activeBtn.dataset.view : 'table';
+}
+
+function switchToView(viewName, opts) {
+  opts = opts || {};
+  const previousView = getCurrentActiveView();
+  document.querySelectorAll('#main-nav button').forEach(b => b.classList.toggle('active', b.dataset.view === viewName));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + viewName));
+  try { sessionStorage.setItem(ACTIVE_TAB_KEY, viewName); } catch (err) { /* storage unavailable - fine, just won't persist */ }
+
+  // Every tab switch becomes a real back/forward step - whether it came from
+  // the nav bar or from something like clicking a team name in Fixtures.
+  if (!opts.skipHistory && viewName !== previousView) {
+    try { history.pushState({ view: viewName }, '', '#' + viewName); } catch (err) { /* history unavailable - tab still switches, just not undoable */ }
+  }
+}
+
+window.addEventListener('popstate', e => {
+  const view = (e.state && e.state.view) || 'table';
+  switchToView(view, { skipHistory: true });
+});
+
 document.getElementById('main-nav').addEventListener('click', e => {
   const btn = e.target.closest('button');
   if (!btn) return;
-  document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-' + btn.dataset.view).classList.add('active');
+  switchToView(btn.dataset.view);
 });
 
 /* TABLE */
@@ -562,6 +600,7 @@ document.getElementById('teams-grid').addEventListener('click', e => {
 });
 
 function changeGW(delta) {
+  userNavigatedFixtures = true;
   viewingGW = Math.max(1, Math.min(38, viewingGW + delta));
   renderFixtures();
 }
@@ -591,10 +630,7 @@ function showTeam(teamName) {
   const idx = DATA.teams.findIndex(t => t.name === teamName);
   if (idx === -1) return;
 
-  document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
-  document.querySelector('#main-nav button[data-view="teams"]').classList.add('active');
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-teams').classList.add('active');
+  switchToView('teams');
 
   const card = document.getElementById('team-card-' + idx);
   if (card) {
@@ -1273,6 +1309,12 @@ async function runFplUpdate() {
     // include the live gameweek if there is one, not just finished ones.
     DATA.current_gameweek = liveGW || DATA.finishedGameweek;
 
+    // Default the Fixtures view to the in-progress gameweek if there is
+    // one, otherwise the most recently completed one - but only while the
+    // user hasn't manually browsed elsewhere, so this doesn't yank them
+    // back to "now" on a later automatic refresh.
+    if (!userNavigatedFixtures) viewingGW = DATA.current_gameweek || 1;
+
     recomputeTable();
     recomputeStreaks();
     recomputeMaxStreaks();
@@ -1311,6 +1353,21 @@ renderStreaks();
 renderMaxStreaks();
 renderRecordHolders();
 renderLuck();
+
+// Work out which tab to open on: a URL hash takes priority (so a shared/
+// bookmarked link to a specific tab works), then whichever tab was active
+// before a refresh, then the default.
+try {
+  const hashView = location.hash ? location.hash.slice(1) : null;
+  const savedTab = sessionStorage.getItem(ACTIVE_TAB_KEY);
+  const initialView =
+    (hashView && VALID_TABS.includes(hashView)) ? hashView :
+    (savedTab && VALID_TABS.includes(savedTab)) ? savedTab :
+    'table';
+  switchToView(initialView, { skipHistory: true });
+  history.replaceState({ view: initialView }, '', '#' + initialView);
+} catch (err) { /* storage/history unavailable - just stays on the default tab */ }
+
 runFplUpdate();
 </script>
 </body>
