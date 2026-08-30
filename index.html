@@ -134,14 +134,21 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .live-player-name{font-weight:600;font-size:.88rem;display:flex;align-items:center;gap:6px;}
 .live-player-fixture{grid-column:1/-1;font-size:.78rem;color:var(--chalk-dim);}
 .live-player-fixture .vs-opponent{color:var(--chalk);}
+.live-player-fixture .home-away{color:var(--chalk-dim);font-family:var(--font-mono);font-size:.72rem;}
 .injury-icon{cursor:help;font-size:.7rem;font-family:var(--font-mono);font-weight:700;padding:2px 6px;border-radius:4px;}
 .injury-icon.injury-out{background:rgba(214,90,90,.2);color:var(--red);}
 .injury-icon.injury-severe{background:rgba(214,90,90,.15);color:var(--red);}
 .injury-icon.injury-moderate{background:rgba(212,168,67,.18);color:var(--gold);}
 .injury-icon.injury-mild{background:rgba(110,201,110,.15);color:var(--green);}
+.live-player-injury-note{grid-column:1/-1;font-size:.75rem;font-style:italic;margin-top:2px;}
+.live-player-injury-note.injury-out{color:var(--red);}
+.live-player-injury-note.injury-severe{color:var(--red);}
+.live-player-injury-note.injury-moderate{color:var(--gold);}
+.live-player-injury-note.injury-mild{color:var(--green);}
 .fixture-status{font-family:var(--font-mono);font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap;}
 .fixture-status.finished{background:var(--panel2);color:var(--chalk-dim);}
-.fixture-status.not-finished{background:rgba(212,168,67,.18);color:var(--gold);}
+.fixture-status.not-finished{background:var(--panel2);color:var(--chalk-dim);}
+.fixture-status.in-progress{background:rgba(212,168,67,.18);color:var(--gold);}
 .fixture-status.no-fixture{background:var(--panel2);color:var(--chalk-dim);}
 .pos-tag{font-family:var(--font-mono);font-size:.65rem;font-weight:700;text-align:center;padding:3px 0;border-radius:3px;color:var(--bg);}
 .pos-tag.def{background:#7fb0e0;}.pos-tag.mid{background:#8fd18c;}.pos-tag.str{background:#e08a6b;}
@@ -789,7 +796,9 @@ function getPlayerRealFixtureInfo(fplId) {
     clubName,
     opponentName,
     hasFixture: !!fixture,
-    finished: fixture ? fixture.finished : false,
+    isHome: fixture ? fixture.team_h === clubId : null,
+    started: fixture ? !!fixture.started : false,
+    finished: fixture ? !!fixture.finished : false,
     injury: getInjuryDisplay(info),
   };
 }
@@ -802,21 +811,27 @@ function showLiveTeamPopup(teamName) {
   document.getElementById('live-team-modal-players').innerHTML = team.players.map(p => {
     const info = getPlayerRealFixtureInfo(p.fplId);
     const injuryBadge = info && info.injury
-      ? `<span class="injury-icon ${info.injury.cls}" title="${esc(info.injury.tooltip)}">🚑 ${esc(info.injury.label)}</span>` : '';
+      ? `<span class="injury-icon ${info.injury.cls}">🚑 ${esc(info.injury.label)}</span>` : '';
+    const injuryNote = info && info.injury
+      ? `<div class="live-player-injury-note ${info.injury.cls}">${esc(info.injury.tooltip)}</div>` : '';
     let fixtureLine, statusBadge;
     if (!info || !info.hasFixture) {
       fixtureLine = 'No fixture data available';
       statusBadge = '<span class="fixture-status no-fixture">—</span>';
     } else {
-      fixtureLine = `${esc(info.clubName)} <span class="vs-opponent">v ${esc(info.opponentName)}</span>`;
+      const homeAway = info.isHome ? '(H)' : '(A)';
+      fixtureLine = `${esc(info.clubName)} <span class="vs-opponent">v ${esc(info.opponentName)}</span> <span class="home-away">${homeAway}</span>`;
       statusBadge = info.finished
         ? '<span class="fixture-status finished">FINISHED</span>'
-        : '<span class="fixture-status not-finished">NOT YET PLAYED</span>';
+        : info.started
+          ? '<span class="fixture-status in-progress">IN PROGRESS</span>'
+          : '<span class="fixture-status not-finished">NOT YET PLAYED</span>';
     }
     return `<div class="live-player-row">
       <div class="live-player-name">${esc(p.name)}${injuryBadge}</div>
       ${statusBadge}
       <div class="live-player-fixture">${fixtureLine}</div>
+      ${injuryNote}
     </div>`;
   }).join('');
 
