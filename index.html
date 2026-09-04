@@ -1707,13 +1707,13 @@ function renderBlackjack() {
 
   if (leaderNoteEl) {
     if (leaders.decided) {
-      const names = leaders.entries.map(e => esc(e.manager)).join(' & ');
+      const names = leaders.entries.map(e => e.manager).join(' & ');
       leaderNoteEl.className = 'blackjack-leader-note decided';
       leaderNoteEl.textContent = leaders.entries.length > 1
         ? `${names} have both hit ${leaders.entries[0].target} exactly — shared win!`
         : `${names} has hit ${leaders.entries[0].target} exactly and wins the £250!`;
     } else if (leaders.entries.length > 0) {
-      const names = leaders.entries.map(e => esc(e.manager)).join(' & ');
+      const names = leaders.entries.map(e => e.manager).join(' & ');
       const total = leaders.entries[0].total;
       const target = leaders.entries[0].target;
       leaderNoteEl.className = 'blackjack-leader-note leading';
