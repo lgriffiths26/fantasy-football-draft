@@ -466,7 +466,7 @@ table.cup-group-table td.cup-pts-cell{font-weight:700;color:var(--gold);}
   <!-- LUCK -->
   <section id="view-luck" class="view">
     <div class="section-title">Luck</div>
-    <div class="luck-explainer">For each team, compares actual points earned against the average points they'd have earned had their goal tally in each fixture been measured against their opponent's output across every gameweek played so far in that half of the season (GW1-19, then GW20-38 restarts the comparison). Positive points luck = your results were better than your underlying performance deserved (lucky); negative points luck = your results were worse than your underlying performance deserved (unlucky). Positive position luck = sitting higher than your underlying output deserves; negative = sitting lower.</div>
+    <div class="luck-explainer">For each team, compares actual points earned against the average points they'd have earned had their goal tally in each fixture been measured against their opponent's output across every gameweek played so far in that half of the season (GW1-19, then GW20-38 restarts the comparison). Own goals are treated as coming off the conceding team's own tally rather than adding to their opponent's (so a 1-1 with an own goal in it reads as 0-0 here, unlike the real table). Positive points luck = your results were better than your underlying performance deserved (lucky); negative points luck = your results were worse than your underlying performance deserved (unlucky). Positive position luck = sitting higher than your underlying output deserves; negative = sitting lower.</div>
     <div class="streaks-wrap">
       <table class="league" id="luck-table">
         <colgroup>
@@ -2347,11 +2347,45 @@ function recomputeMostImportantPlayers() {
   DATA.statistics.mostImportantPlayers = list;
 }
 
+// Luck treats an own goal differently from the real league scoreline. In the
+// real table/Fixtures/Cup an own goal correctly benefits the OPPONENT (that's
+// how football works, and those tabs are unchanged) - but for judging a
+// team's own underlying output, a player putting the ball in their own net
+// should come off THEIR team's tally for the week instead, not get added to
+// whoever they're facing. A team that scores one goal and also concedes an
+// own goal from one of its own players didn't really trouble anyone that
+// week - for luck purposes that reads as 0-0, not the 1-1 the real table
+// (rightly) shows.
+function ownGoalCount(scorers) {
+  return (scorers || []).filter(s => s.indexOf('Own Goal') === 0).length;
+}
+
+// Reconstructs one side's luck-adjusted score from the stored fixture data:
+// rawScore already has the real-table own-goal credit baked in (see
+// computeGameweekResult), so first strip out whatever this side was
+// credited from the OPPONENT's own goals (ownScorers holds those, labelled
+// "Own Goal (...)") to get this side's genuine tally - then subtract this
+// side's own own-goals (found in oppScorers, since that's where the real
+// scoreline logic put them) from that genuine tally, floored at zero.
+function luckAdjustedScore(rawScore, ownScorers, oppScorers) {
+  if (rawScore === null || rawScore === undefined) return null;
+  const creditedFromOpponentOwnGoals = ownGoalCount(ownScorers);
+  const committedByThisSide = ownGoalCount(oppScorers);
+  const genuineGoals = rawScore - creditedFromOpponentOwnGoals;
+  // Deliberately NOT floored at zero: a team that concedes more own goals
+  // than it scores genuine goals didn't just "fail to trouble anyone" - it
+  // would have lost to literally any opponent that gameweek (even one that
+  // also blanked), so it needs to read as worse than a team that scored a
+  // genuine 0. A -1 here beats a 0 to nobody and loses to everybody, which
+  // is exactly what actually happened.
+  return genuineGoals - committedByThisSide;
+}
+
 function teamScoreInGameweek(teamName, gw) {
   const matches = DATA.fixtures[String(gw)] || [];
   for (const m of matches) {
-    if (m.home === teamName) return m.home_score;
-    if (m.away === teamName) return m.away_score;
+    if (m.home === teamName) return luckAdjustedScore(m.home_score, m.home_scorers, m.away_scorers);
+    if (m.away === teamName) return luckAdjustedScore(m.away_score, m.away_scorers, m.home_scorers);
   }
   return null;
 }
@@ -2382,8 +2416,12 @@ function computeLuckForBlock(teamName, blockStart, blockEnd) {
     const match = matches.find(m => m.home === teamName || m.away === teamName);
     if (!match) continue;
     const isHome = match.home === teamName;
-    const myScore = isHome ? match.home_score : match.away_score;
-    const oppScore = isHome ? match.away_score : match.home_score;
+    const myScore = isHome
+      ? luckAdjustedScore(match.home_score, match.home_scorers, match.away_scorers)
+      : luckAdjustedScore(match.away_score, match.away_scorers, match.home_scorers);
+    const oppScore = isHome
+      ? luckAdjustedScore(match.away_score, match.away_scorers, match.home_scorers)
+      : luckAdjustedScore(match.home_score, match.home_scorers, match.away_scorers);
     const opponent = isHome ? match.away : match.home;
     if (myScore === null || oppScore === null) continue;
 
