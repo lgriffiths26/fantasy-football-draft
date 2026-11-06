@@ -575,7 +575,7 @@ table.cup-group-table td.cup-pts-cell{font-weight:700;color:var(--gold);}
 
   <section id="view-players" class="view">
     <div class="section-title">All Players Ever Drafted</div>
-    <div class="alltime-explainer">Career totals for every player drafted across all completed seasons of the league. "Drafted Cost" is what was paid for them on draft night. "Transfer Cost" is what was paid to transfer them in at Transfer Night. A crown next to a player's name marks each season they were on the winning draft team. Click a player for their season-by-season record.</div>
+    <div class="alltime-explainer">Career totals for every player drafted across all completed seasons of the league. "Drafted" is the number of seasons they had a slot at the draft itself; a season where they were only ever picked up later as a transfer doesn't count. "Drafted Cost" is what was paid for them on draft night. "Transfers In" is the number of times they were transferred into a different team at Transfer Night. "Transfer Cost" is what was paid to transfer them in at Transfer Night. A crown next to a player's name marks each season they were on the winning draft team. Click a player for their season-by-season record.</div>
     <div class="teams-search-wrap">
       <input type="text" id="players-search" class="teams-search-input" placeholder="Search players…" autocomplete="off">
       <span class="teams-search-count" id="players-search-count"></span>
@@ -1148,10 +1148,14 @@ function getPlayerSeasonHistory(playerName) {
 
 function showPlayerHistoryModal(playerName) {
   const rows = getPlayerSeasonHistory(playerName);
-  // A mid-season transfer (drafted by one team, moved to another on
-  // Transfer Night) produces two rows for the same season - that's one
-  // season drafted, not two, so count distinct seasons rather than rows.
-  const seasonCount = new Set(rows.map(r => r.season)).size;
+  // Matches the Players tab's "Drafted" column: count seasons with an
+  // actual draft-night slot (a row that isn't itself a transfer-in), not
+  // every season they appeared in. A transfer-only season (picked up
+  // mid-season, never taken at the draft that year) doesn't count here
+  // even though it's still listed in the table below; a season where they
+  // were drafted and later moved on Transfer Night (two rows, one season)
+  // still counts once.
+  const seasonCount = new Set(rows.filter(r => !r.transferredIn).map(r => r.season)).size;
   document.getElementById('player-history-modal-name').textContent = playerName;
   document.getElementById('player-history-modal-sub').textContent =
     seasonCount + (seasonCount === 1 ? ' season' : ' seasons') + ' drafted in the league';
@@ -1224,10 +1228,15 @@ function buildPlayerCareerStats() {
       if (r.transferredOut) transfersOut++;
       if (r.won) timesWon++;
     }
-    // A mid-season transfer (drafted by one team, moved to another on
-    // Transfer Night, like Zian Flemming in 25/26) produces two rows for
-    // the same season - that's one season drafted, not two.
-    const timesDrafted = new Set(rows.map(r => r.season)).size;
+    // "Drafted" counts seasons where the player had an actual draft-night
+    // slot (a row that isn't itself a transfer-in) - not just any season
+    // they appeared in. A season where they were only ever transferred in
+    // (picked up mid-season, never taken at the draft that year) doesn't
+    // count as drafted, even though it's one of their seasons in the
+    // league; a season where they were drafted and *then* moved on
+    // Transfer Night (like Zian Flemming in 25/26) still counts once as
+    // drafted despite producing two rows for that season.
+    const timesDrafted = new Set(rows.filter(r => !r.transferredIn).map(r => r.season)).size;
     stats.push({
       name: rows[0].name, timesDrafted, goals,
       costDrafted, costTransferIn, transfersIn, transfersOut, timesWon
