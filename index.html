@@ -277,7 +277,11 @@ table.league .pts-col{font-weight:700;color:var(--gold);}
 .crown-icon{fill:var(--gold);flex-shrink:0;vertical-align:middle;}
 #players-table{table-layout:fixed;width:100%;min-width:588px;}
 #players-table th{position:static;}
-#players-table th.sticky-team-col{position:sticky;left:0;background:var(--bg2);z-index:2;}
+#players-table th.sticky-team-col,#players-table td:first-child{
+  width:190px;max-width:190px;min-width:190px;box-sizing:border-box;
+}
+#players-table th.sticky-team-col{position:sticky;left:0;background:var(--bg2);z-index:2;-webkit-transform:translateZ(0);transform:translateZ(0);}
+#players-table td:first-child{position:sticky;left:0;background:var(--panel);z-index:1;-webkit-transform:translateZ(0);transform:translateZ(0);}
 .blackjack-rules{font-size:.82rem;color:var(--chalk-dim);margin-bottom:16px;line-height:1.5;}
 .blackjack-prize{color:var(--gold);font-weight:600;}
 .blackjack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
