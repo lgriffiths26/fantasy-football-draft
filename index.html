@@ -1292,7 +1292,7 @@ function renderPlayersTab() {
   emptyEl.style.display = (query.length > 0 && rows.length === 0) ? 'block' : 'none';
 
   tbody.innerHTML = rows.map(r => `<tr>
-      <td class="team-name team-link player-name-cell" data-player="${esc(r.name)}">${esc(r.name)}${crownIcon().repeat(r.timesWon)}</td>
+      <td class="team-name team-link" data-player="${esc(r.name)}"><span class="player-name-cell">${esc(r.name)}${crownIcon().repeat(r.timesWon)}</span></td>
       <td>${r.timesDrafted}</td>
       <td>${fmtGBP(r.costDrafted)}</td>
       <td>${r.transfersIn}</td>
